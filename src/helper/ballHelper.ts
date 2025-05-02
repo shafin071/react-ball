@@ -84,14 +84,36 @@ class BallHelper {
     }
 
     handleBallCollisionWithPaddle(ballDims: BallDimensions): void {
+        // const paddleDims = getPaddleDimensions(this.paddleRef);
+        // if (ballDims.bottomEdge >= paddleDims.topEdge - 10) {
+        //     // Get current position
+        //     let currentLeft = (ballDims.leftEdge || 0);
+        //     let currentRight = (ballDims.rightEdge || 0);
+        //     let currentBottom = (ballDims.bottomEdge || 0);
+        //     let currentTop = (ballDims.topEdge || 0);
+
+        //     if (
+        //         this.velocity.current.y > 0 && // Ensure the ball is moving downward
+        //         currentBottom >= paddleDims.topEdge &&
+        //         currentTop <= paddleDims.topEdge + paddleDims.paddleHeight &&
+        //         currentRight >= paddleDims.leftEdge &&
+        //         currentLeft <= paddleDims.rightEdge
+        //     ) {
+        //         this.velocity.current.y *= -1; // Reverse vertical direction
+        //         // currentTop = paddleRect.top - ballRect.height; // Position the ball on top of the paddle
+        //     }
+        // }
+
         const paddleDims = getPaddleDimensions(this.paddleRef);
+
         if (ballDims.bottomEdge >= paddleDims.topEdge - 10) {
             // Get current position
             let currentLeft = (ballDims.leftEdge || 0);
             let currentRight = (ballDims.rightEdge || 0);
             let currentBottom = (ballDims.bottomEdge || 0);
             let currentTop = (ballDims.topEdge || 0);
-            
+
+            // Check if the ball is colliding with the paddle
             if (
                 this.velocity.current.y > 0 && // Ensure the ball is moving downward
                 currentBottom >= paddleDims.topEdge &&
@@ -99,10 +121,47 @@ class BallHelper {
                 currentRight >= paddleDims.leftEdge &&
                 currentLeft <= paddleDims.rightEdge
             ) {
-                this.velocity.current.y *= -1; // Reverse vertical direction
-                // currentTop = paddleRect.top - ballRect.height; // Position the ball on top of the paddle
+                console.log('Ball collided with paddle!');
+                // Reverse vertical direction
+                this.velocity.current.y *= -1;
+
+                // Calculate the paddle center and ball center
+                const paddleCenter = paddleDims.leftEdge + (paddleDims.rightEdge - paddleDims.leftEdge) / 2;
+                const ballCenter = currentLeft + (currentRight - currentLeft) / 2;
+                console.log('paddleDims.leftEdge:', paddleDims.leftEdge, 'Paddle center:', paddleCenter, ' paddleDims.rightEdge:', paddleDims.rightEdge, ' Ball center:', ballCenter);
+
+                // Adjust horizontal velocity based on where the ball hits the paddle
+                // if (ballCenter < paddleCenter && currentRight >= paddleDims.leftEdge) {
+                if (ballCenter >= paddleDims.leftEdge && ballCenter < (paddleCenter - (paddleDims.width/6))) {
+                    // Ball hits the left side of the paddle
+                    if (Math.abs(this.velocity.current.x) > 0) {
+                        this.velocity.current.x = Math.abs(this.velocity.current.x) * -1; // Reverse direction
+                    } else {
+                        this.velocity.current.x = -3; // Move left
+                    }
+                    // this.velocity.current.x = Math.abs(this.velocity.current.x) * -1; // Move left
+                    console.log('Ball hits the left side of the paddle!', this.velocity.current.x);
+
+                // } else if (ballCenter > paddleCenter && currentLeft <= paddleDims.rightEdge) {
+                } else if (ballCenter <= paddleDims.rightEdge && ballCenter > (paddleCenter + (paddleDims.width/6))) {
+                    // Ball hits the right side of the paddle
+                    if (Math.abs(this.velocity.current.x) > 0) {
+                        this.velocity.current.x = Math.abs(this.velocity.current.x) * 1; // Reverse direction
+                    } else {
+                        this.velocity.current.x = 3; // Move right
+
+                        // this.velocity.current.x = Math.abs(this.velocity.current.x); // Move right
+                        console.log('Ball hits the right side of the paddle!', this.velocity.current.x);
+                    }
+
+                } else {
+                    // Ball hits the center of the paddle
+                    this.velocity.current.x = 0; // Move straight up
+                    console.log('Ball hits the center of the paddle!', this.velocity.current.x);
+                }
             }
         }
+
     }
 
     handleBallCollisionWithBricks(playAreaDims: PlayAreaDimensions, ballDims: BallDimensions, brickRefs: React.RefObject<(HTMLDivElement | null)[]>, brickCount: { current: number }): void {
