@@ -1,6 +1,6 @@
 import { Gamestate, PlayAreaDimensions, PaddleDimensions, BallDimensions, moveBallProps } from "../models/gameModels";
 import { getPaddleDimensions } from './paddleHelper';
-import { getBrickDimensions } from "./brickHelper";
+import { getBrickAreaDimensions, getBrickDimensions } from "./brickHelper";
 
 
 const setInitialBallPosition = (ballRef: React.RefObject<HTMLDivElement | null>, playAreaDims: PlayAreaDimensions, paddleDims: PaddleDimensions) => {
@@ -38,27 +38,6 @@ class BallHelper {
         return { width: 0, leftEdge: 0, rightEdge: 0, topEdge: 0, bottomEdge: 0 };
     }
 
-    // handleBallCollisionWithBoundaries(ballDims: BallDimensions, playAreaDims: PlayAreaDimensions): void {
-    //     // Check for collisions with left-right boundaries
-    //     if (ballDims.leftEdge <= 0 || ballDims.rightEdge >= playAreaDims.width) {
-    //         this.velocity.current.x *= -1; // Reverse horizontal direction
-    //     }
-
-    //     // Check for collisions with top boundary
-    //     if (ballDims.topEdge <= 0) {
-    //         this.velocity.current.y *= -1; // Reverse vertical direction
-    //     }
-
-    //     // Check for collisions with bottom boundary
-    //     if (ballDims.bottomEdge >= playAreaDims.height) {
-    //         console.log('Game Over! Ball hit the bottom!');
-    //         this.gameStore.endGame(false); // Trigger game over state
-    //         if (this.paddleRef.current) {
-    //             this.paddleRef.current.style.animation = 'blinker 1s linear infinite';
-    //         }
-    //     }
-    // }
-
     handleBallCollisionWithBoundaries(ballDims: BallDimensions, playAreaDims: PlayAreaDimensions): boolean {
         // Check for collisions with left-right boundaries
         if (ballDims.leftEdge <= 0 || ballDims.rightEdge >= playAreaDims.width) {
@@ -84,81 +63,76 @@ class BallHelper {
     }
 
     handleBallCollisionWithPaddle(ballDims: BallDimensions): void {
-        // const paddleDims = getPaddleDimensions(this.paddleRef);
-        // if (ballDims.bottomEdge >= paddleDims.topEdge - 10) {
-        //     // Get current position
-        //     let currentLeft = (ballDims.leftEdge || 0);
-        //     let currentRight = (ballDims.rightEdge || 0);
-        //     let currentBottom = (ballDims.bottomEdge || 0);
-        //     let currentTop = (ballDims.topEdge || 0);
-
-        //     if (
-        //         this.velocity.current.y > 0 && // Ensure the ball is moving downward
-        //         currentBottom >= paddleDims.topEdge &&
-        //         currentTop <= paddleDims.topEdge + paddleDims.paddleHeight &&
-        //         currentRight >= paddleDims.leftEdge &&
-        //         currentLeft <= paddleDims.rightEdge
-        //     ) {
-        //         this.velocity.current.y *= -1; // Reverse vertical direction
-        //         // currentTop = paddleRect.top - ballRect.height; // Position the ball on top of the paddle
-        //     }
-        // }
-
         const paddleDims = getPaddleDimensions(this.paddleRef);
 
-        if (ballDims.bottomEdge >= paddleDims.topEdge - 10) {
-            // Get current position
-            let currentLeft = (ballDims.leftEdge || 0);
-            let currentRight = (ballDims.rightEdge || 0);
-            let currentBottom = (ballDims.bottomEdge || 0);
-            let currentTop = (ballDims.topEdge || 0);
+        // Get current position
+        let currentLeft = (ballDims.leftEdge || 0);
+        let currentRight = (ballDims.rightEdge || 0);
+        let currentBottom = (ballDims.bottomEdge || 0);
+        let currentTop = (ballDims.topEdge || 0);
 
-            // Check if the ball is colliding with the paddle
-            if (
-                this.velocity.current.y > 0 && // Ensure the ball is moving downward
-                currentBottom >= paddleDims.topEdge &&
-                currentTop <= paddleDims.topEdge + paddleDims.paddleHeight &&
-                currentRight >= paddleDims.leftEdge &&
-                currentLeft <= paddleDims.rightEdge
-            ) {
-                console.log('Ball collided with paddle!');
-                // Reverse vertical direction
-                this.velocity.current.y *= -1;
+        // Check if the ball is colliding with the paddle
+        if (
+            this.velocity.current.y > 0 && // Ensure the ball is moving downward
+            currentBottom >= paddleDims.topEdge &&
+            currentTop <= paddleDims.topEdge + paddleDims.paddleHeight &&
+            currentRight >= paddleDims.leftEdge &&
+            currentLeft <= paddleDims.rightEdge
+        ) {
+            // Reverse vertical direction
+            this.velocity.current.y *= -1;
 
-                // Calculate the paddle center and ball center
-                const paddleCenter = paddleDims.leftEdge + (paddleDims.rightEdge - paddleDims.leftEdge) / 2;
-                const ballCenter = currentLeft + (currentRight - currentLeft) / 2;
-                console.log('paddleDims.leftEdge:', paddleDims.leftEdge, 'Paddle center:', paddleCenter, ' paddleDims.rightEdge:', paddleDims.rightEdge, ' Ball center:', ballCenter);
+            // Calculate the paddle center and ball center
+            const paddleCenter = paddleDims.leftEdge + (paddleDims.rightEdge - paddleDims.leftEdge) / 2;
+            const ballCenter = currentLeft + (currentRight - currentLeft) / 2;
+            console.log('paddleDims.leftEdge:', paddleDims.leftEdge, 'Paddle center:', paddleCenter, ' paddleDims.rightEdge:', paddleDims.rightEdge, ' Ball center:', ballCenter);
 
-                // Adjust horizontal velocity based on where the ball hits the paddle
-                // if (ballCenter < paddleCenter && currentRight >= paddleDims.leftEdge) {
-                if (ballCenter >= paddleDims.leftEdge && ballCenter < (paddleCenter - (paddleDims.width/6))) {
-                    // Ball hits the left side of the paddle
-                    if (Math.abs(this.velocity.current.x) > 0) {
-                        this.velocity.current.x = Math.abs(this.velocity.current.x) * -1; // Reverse direction
-                    } else {
-                        this.velocity.current.x = -3; // Move left
-                    }
-                    // this.velocity.current.x = Math.abs(this.velocity.current.x) * -1; // Move left
-                    console.log('Ball hits the left side of the paddle!', this.velocity.current.x);
+            // Paddle zones/edges and corresponding x directions of the ball:
+            // Note: The paddle is divided into 5 zones to determine the angle at which the ball will bounce of the paddle.
 
-                // } else if (ballCenter > paddleCenter && currentLeft <= paddleDims.rightEdge) {
-                } else if (ballCenter <= paddleDims.rightEdge && ballCenter > (paddleCenter + (paddleDims.width/6))) {
-                    // Ball hits the right side of the paddle
-                    if (Math.abs(this.velocity.current.x) > 0) {
-                        this.velocity.current.x = Math.abs(this.velocity.current.x) * 1; // Reverse direction
-                    } else {
-                        this.velocity.current.x = 3; // Move right
+            //  x=-3      x=-2                          x=0                         x=2         x=3 
+            //  ____________________________________________________________________________________
+            // | LZ |  Left Zone     |              Center zone              |  Right Zone    |  RZ |
+            // |__1_|______2_________|___________________|___________________|_______2________|__1__|
+            // A    B                C             Paddle center             D                E     F
 
-                        // this.velocity.current.x = Math.abs(this.velocity.current.x); // Move right
-                        console.log('Ball hits the right side of the paddle!', this.velocity.current.x);
-                    }
+            //                       | <-paddleWidth/8-> | <-paddleWidth/8-> |
+            
+            const A = paddleDims.leftEdge;
+            const F = paddleDims.rightEdge;
+            
+            const C = paddleCenter - (paddleDims.width / 8);
+            const D = paddleCenter + (paddleDims.width / 8);
 
-                } else {
-                    // Ball hits the center of the paddle
-                    this.velocity.current.x = 0; // Move straight up
-                    console.log('Ball hits the center of the paddle!', this.velocity.current.x);
-                }
+            const B = A + (C - A) / 4;
+            const E = F - (F - D) / 4;
+
+            console.log('A:', A, ' B:', B, ' C:', C, ' D:', D, ' E:', E, ' F:', F, ' currentLeft:', currentLeft, ' currentRight:', currentRight, ' ballCenter:', ballCenter);
+
+            if (currentRight >= A && ballCenter <= B) {
+                // Ball hit Left Zone 1
+                console.log('Ball hit Left Zone 1');
+                this.velocity.current.x = -3;
+            }
+            else if (ballCenter > B && ballCenter <= C) {
+                // Ball hit Left Zone 2
+                console.log('Ball hit Left Zone 2');
+                this.velocity.current.x = -2;
+            }
+            else if (ballCenter > C && ballCenter <= D) {
+                // Ball hit Center Zone
+                console.log('Ball hit Center Zone');
+                this.velocity.current.x = 0;
+            }
+            else if (ballCenter > D && ballCenter <= E) {
+                // Ball hit Right Zone 2
+                console.log('Ball hit Right Zone 2');
+                this.velocity.current.x = 2;
+            }
+            else if (ballCenter > E && currentLeft <= F) {
+                // Ball hit Right Zone 1
+                console.log('Ball hit Right Zone 1');
+                this.velocity.current.x = 3;
             }
         }
 
@@ -238,19 +212,22 @@ class BallHelper {
         if (!this.ballRef.current || !this.paddleRef.current || !brickRefs.current) return;
 
         const ballDims = this.getBallDimensions();
-
-        // Handle collisions with boundaries
-        // this.handleBallCollisionWithBoundaries(ballDims, playAreaDims);
+        const paddleDims = getPaddleDimensions(this.paddleRef);
 
         // Handle collisions with boundaries
         const hitBottom = this.handleBallCollisionWithBoundaries(ballDims, playAreaDims);
         if (hitBottom) return; // Exit if the ball hits the bottom boundary
 
-        // Handle collisions with paddle
-        this.handleBallCollisionWithPaddle(ballDims);
+        // Handle collisions with paddle when the ball is near the paddle
+        if (ballDims.bottomEdge >= paddleDims.topEdge - 10) {
+            this.handleBallCollisionWithPaddle(ballDims);
+        }
 
-        // Handle collisions with bricks
-        this.handleBallCollisionWithBricks(playAreaDims, ballDims, brickRefs, brickCount);
+        // Handle collisions with bricks if ball is near the brick section
+        const { brickSectionHeight } = getBrickAreaDimensions(playAreaDims);
+        if (ballDims.topEdge <= brickSectionHeight + 10) {
+            this.handleBallCollisionWithBricks(playAreaDims, ballDims, brickRefs, brickCount);
+        }
 
         // Handle all bricks destroyed
         this.handleAllBricksDestroyed(brickCount);
