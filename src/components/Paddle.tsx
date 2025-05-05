@@ -80,6 +80,7 @@ const Paddle: React.FC<PaddleProps> = ({ playAreaRef, paddleRef }) => {
         height: `${paddleHeight}px`,
         position: 'absolute',
         backgroundColor: 'black',
+        borderRadius: '10px',
         transition: 'left 0.1s linear', // Smooth transition for left property
     };
 

@@ -69,7 +69,7 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, brickRefs }) => {
         width: `${diameter}px`,
         height: `${diameter}px`,
         borderRadius: '50%',
-        backgroundColor: 'red',
+        backgroundColor: '#6063d0',
         position: 'absolute',
     };
 

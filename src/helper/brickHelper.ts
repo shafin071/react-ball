@@ -1,4 +1,12 @@
-import { PlayAreaDimensions, BrickDimensions } from "../models/gameModels";
+import { PlayAreaDimensions, BrickAreaDimensions, BrickDimensions } from "../models/gameModels";
+
+
+const getBrickAreaDimensions = (playAreaDims: PlayAreaDimensions): BrickAreaDimensions => {
+    const brickAreaHeightRatio = 5; // Ratio of the height of the brick section to the height of the play area
+        const brickSectionHeight = playAreaDims.height / brickAreaHeightRatio // 3
+        const brickSectionWidth = playAreaDims.width
+        return {brickSectionHeight, brickSectionWidth}
+}
 
 
 const getBrickDimensions = (brick: HTMLDivElement, playAreaDims: PlayAreaDimensions): BrickDimensions => {
@@ -12,4 +20,4 @@ const getBrickDimensions = (brick: HTMLDivElement, playAreaDims: PlayAreaDimensi
 }
 
 
-export { getBrickDimensions };
+export { getBrickAreaDimensions, getBrickDimensions };

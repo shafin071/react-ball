@@ -1,15 +1,14 @@
-import { useRef } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css'
 import PlayArea from './components/PlayArea';
-// import Paddle from './components/Paddle';
 
 
 function App() {
-	const width = 600
-    const height = 500
+	const width = 800
+    const height = 600
+
+	// const width = 1000
+    // const height = 800
 
 	const playAreaContainerStyle: React.CSSProperties = {
 		width: width,
@@ -18,6 +17,7 @@ function App() {
 		flexDirection: 'column',
 		justifyContent: 'center',
 		alignItems: 'center',
+		marginTop: '40px',
 	}
 
 	return (
