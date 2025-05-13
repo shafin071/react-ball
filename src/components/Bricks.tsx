@@ -16,11 +16,11 @@ export default function Bricks({ playAreaRef, brickRefs }: BricksProps) {
     const playAreaDims = getPlayAreaDimensions(playAreaRef);
     const { brickSectionHeight, brickSectionWidth } = getBrickAreaDimensions(playAreaDims);
 
-    let rows = Math.floor(brickSectionHeight / (brickHeight + 5));
-    let bricksPerRow = Math.floor(brickSectionWidth / (brickWidth + 5));
+    // let rows = Math.floor(brickSectionHeight / (brickHeight + 5));
+    // let bricksPerRow = Math.floor(brickSectionWidth / (brickWidth + 5));
 
-    // const rows = 1; // Number of rows
-    // const bricksPerRow = 1; // Number of bricks per row
+    const rows = 1; // Number of rows
+    const bricksPerRow = 1; // Number of bricks per row
     // console.log('playAreaDims.height: ', playAreaDims.height, 'no. of rows:', rows, 'playAreaDims.width: ', playAreaDims.width, 'bricksPerRow:', bricksPerRow);
 
     const brickStyle: React.CSSProperties = {

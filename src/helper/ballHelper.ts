@@ -13,14 +13,12 @@ const setInitialBallPosition = (ballRef: React.RefObject<HTMLDivElement | null>,
 class BallHelper {
     private ballRef: React.RefObject<HTMLDivElement | null>;
     private paddleRef: React.RefObject<HTMLDivElement | null>;
-    // private brickRefs: React.RefObject<(HTMLDivElement | null)[]>;
     private velocity: { current: { x: number; y: number } };
     private gameStore: Gamestate;
 
     constructor(moveBallProps: moveBallProps) {
         this.ballRef = moveBallProps.ballRef;
         this.paddleRef = moveBallProps.paddleRef;
-        // this.brickRefs = moveBallProps.brickRefs;
         this.velocity = moveBallProps.velocity;
         this.gameStore = moveBallProps.gameStore;
     }
@@ -75,7 +73,7 @@ class BallHelper {
         if (
             this.velocity.current.y > 0 && // Ensure the ball is moving downward
             currentBottom >= paddleDims.topEdge &&
-            currentTop <= paddleDims.topEdge + paddleDims.paddleHeight &&
+            currentTop <= paddleDims.topEdge + paddleDims.height &&
             currentRight >= paddleDims.leftEdge &&
             currentLeft <= paddleDims.rightEdge
         ) {
@@ -85,7 +83,7 @@ class BallHelper {
             // Calculate the paddle center and ball center
             const paddleCenter = paddleDims.leftEdge + (paddleDims.rightEdge - paddleDims.leftEdge) / 2;
             const ballCenter = currentLeft + (currentRight - currentLeft) / 2;
-            console.log('paddleDims.leftEdge:', paddleDims.leftEdge, 'Paddle center:', paddleCenter, ' paddleDims.rightEdge:', paddleDims.rightEdge, ' Ball center:', ballCenter);
+            // console.log('paddleDims.leftEdge:', paddleDims.leftEdge, 'Paddle center:', paddleCenter, ' paddleDims.rightEdge:', paddleDims.rightEdge, ' Ball center:', ballCenter);
 
             // Paddle zones/edges and corresponding x directions of the ball:
             // Note: The paddle is divided into 5 zones to determine the angle at which the ball will bounce of the paddle.
@@ -107,31 +105,31 @@ class BallHelper {
             const B = A + (C - A) / 4;
             const E = F - (F - D) / 4;
 
-            console.log('A:', A, ' B:', B, ' C:', C, ' D:', D, ' E:', E, ' F:', F, ' currentLeft:', currentLeft, ' currentRight:', currentRight, ' ballCenter:', ballCenter);
+            // console.log('A:', A, ' B:', B, ' C:', C, ' D:', D, ' E:', E, ' F:', F, ' currentLeft:', currentLeft, ' currentRight:', currentRight, ' ballCenter:', ballCenter);
 
             if (currentRight >= A && ballCenter <= B) {
                 // Ball hit Left Zone 1
-                console.log('Ball hit Left Zone 1');
+                // console.log('Ball hit Left Zone 1');
                 this.velocity.current.x = -3;
             }
             else if (ballCenter > B && ballCenter <= C) {
                 // Ball hit Left Zone 2
-                console.log('Ball hit Left Zone 2');
+                // console.log('Ball hit Left Zone 2');
                 this.velocity.current.x = -2;
             }
             else if (ballCenter > C && ballCenter <= D) {
                 // Ball hit Center Zone
-                console.log('Ball hit Center Zone');
+                // console.log('Ball hit Center Zone');
                 this.velocity.current.x = 0;
             }
             else if (ballCenter > D && ballCenter <= E) {
                 // Ball hit Right Zone 2
-                console.log('Ball hit Right Zone 2');
+                // console.log('Ball hit Right Zone 2');
                 this.velocity.current.x = 2;
             }
             else if (ballCenter > E && currentLeft <= F) {
                 // Ball hit Right Zone 1
-                console.log('Ball hit Right Zone 1');
+                // console.log('Ball hit Right Zone 1');
                 this.velocity.current.x = 3;
             }
         }
@@ -139,8 +137,10 @@ class BallHelper {
     }
 
     handleBallCollisionWithBricks(playAreaDims: PlayAreaDimensions, ballDims: BallDimensions, brickRefs: React.RefObject<(HTMLDivElement | null)[]>, brickCount: { current: number }): void {
+        // console.log('brickCount:', brickCount.current, 'brickRefs:', brickRefs.current);
         for (let index = 0; index < brickRefs.current.length; index++) {
             const brick = brickRefs.current[index];
+            // console.log('brick:', brick.style.left, 'brick:', brick?.style.top);
 
             if (brick && this.ballRef.current) {
                 // Check if the brick already has the 'brick-exit' class
@@ -149,6 +149,7 @@ class BallHelper {
                 }
 
                 const brickDims = getBrickDimensions(brick, playAreaDims);
+                // console.log('ballDims:', ballDims, 'brickDims:', brickDims);
                 if (
                     ballDims.rightEdge >= brickDims.leftEdge &&
                     ballDims.leftEdge <= brickDims.rightEdge &&

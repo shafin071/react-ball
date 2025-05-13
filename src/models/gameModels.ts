@@ -29,7 +29,7 @@ type PaddleDimensions = {
     width: number,
     leftEdge: number,
     rightEdge: number,
-    paddleHeight: number,
+    height: number,
     topEdge: number;
 }
 

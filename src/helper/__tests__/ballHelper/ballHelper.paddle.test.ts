@@ -1,19 +1,12 @@
-import { BallHelper, setInitialBallPosition } from './ballHelper';
-import { getPaddleDimensions } from './paddleHelper';
-import { getBrickAreaDimensions, getBrickDimensions } from './brickHelper';
-import { moveBallProps } from '../models/gameModels';
-import { Gamestate } from '../models/gameModels';
+import { BallHelper } from '../../ballHelper';
+import { getPaddleDimensions } from '../../paddleHelper';
+import { moveBallProps } from '../../../models/gameModels';
+import { Gamestate } from '../../../models/gameModels';
 
-jest.mock('./paddleHelper', () => ({
+
+jest.mock('../../paddleHelper', () => ({
     getPaddleDimensions: jest.fn(),
 }));
-
-jest.mock('./brickHelper', () => ({
-    getBrickAreaDimensions: jest.fn(),
-    getBrickDimensions: jest.fn(),
-}));
-
-
 
 
 describe('BallHelper collision with paddle', () => {
@@ -166,4 +159,3 @@ describe('BallHelper collision with paddle', () => {
         expect(velocity.current.y).toBe(expectedY); // Vertical direction
     });
 });
-

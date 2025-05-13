@@ -21,12 +21,12 @@ const getPaddleDimensions = (paddleRef: React.RefObject<HTMLDivElement | null>):
         const width = parseFloat(paddleRef.current.style.width || '0');
         const leftEdge = parseFloat(paddleRef.current.style.left || '0');
         const rightEdge = (leftEdge + width || 0);
-        const paddleHeight = parseFloat(paddleRef.current.style.height || '0');
+        const height = parseFloat(paddleRef.current.style.height || '0');
         const topEdge = parseFloat(paddleRef.current.style.top || '0');
         
-        return { width, leftEdge, rightEdge, paddleHeight, topEdge };
+        return { width, leftEdge, rightEdge, height, topEdge };
     }
-    return { width: 0, leftEdge: 0, rightEdge: 0, paddleHeight: 0, topEdge: 0 };
+    return { width: 0, leftEdge: 0, rightEdge: 0, height: 0, topEdge: 0 };
 }
 
 
@@ -64,6 +64,7 @@ const setInitialPaddlePosition = (paddleRef: React.RefObject<HTMLDivElement | nu
  * If the `paddleRef` is null or the paddle element is not mounted, this function does nothing.
  */
 const movePaddle = (paddleRef: React.RefObject<HTMLDivElement | null>, newLeft: number) => {
+    // console.log('Moving paddle to new left position:', newLeft);
     if (paddleRef.current) {
         paddleRef.current.style.left = `${newLeft}px`;
     }
