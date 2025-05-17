@@ -68,8 +68,8 @@ const PlayArea: React.FC = () => {
                 {(gameStore.gameStarted && !gameStore.gameWon) && (
                     <>
                         <Bricks playAreaRef={playAreaRef} brickRefs={brickRefs} />
-                        <Ball playAreaRef={playAreaRef} paddleRef={paddleRef} ballRef={ballRef} brickRefs={brickRefs} />
                         <Paddle playAreaRef={playAreaRef} paddleRef={paddleRef} />
+                        <Ball playAreaRef={playAreaRef} paddleRef={paddleRef} ballRef={ballRef} brickRefs={brickRefs} />
                     </>
                 )}
             </div>
