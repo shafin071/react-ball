@@ -20,11 +20,16 @@ type PlayAreaDimensions = {
     height: number;
 }
 
+type BrickAreaDimensions = {
+    brickSectionHeight: number,
+    brickSectionWidth: number
+}
+
 type PaddleDimensions = {
     width: number,
     leftEdge: number,
     rightEdge: number,
-    paddleHeight: number,
+    height: number,
     topEdge: number;
 }
 
@@ -56,4 +61,4 @@ type moveBallProps = {
     gameStore: Gamestate; // Game state management
 }
 
-export type { Gamestate, PlayAreaDimensions, PaddleDimensions, BallDimensions, BrickDimensions, moveBallProps };
+export type { Gamestate, PlayAreaDimensions, BrickAreaDimensions, PaddleDimensions, BallDimensions, BrickDimensions, moveBallProps };

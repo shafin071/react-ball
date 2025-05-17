@@ -3,6 +3,7 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	font-family: 'Consolas', monospace; /* Apply Consolas font */
 }
 
 .logo {
@@ -74,6 +75,7 @@
     border-radius: 5px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s ease;
+	font-weight: bold;
 }
 
 .start-game-btn:hover {
@@ -92,17 +94,21 @@
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	font-weight: bold;
-    font-size: 20px;
+    font-size: 25px;
 }
 
-.game-over-message,
-.game-won-message {
+.game-over-message-div,
+.game-won-message-div {
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	text-align: center;
 	z-index: 10;
+}
+
+.game-over-message,
+.game-won-message {
 	background-color: rgba(255, 255, 255, 0.9);
 	padding: 20px;
 	border-radius: 10px;

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { getPlayAreaDimensions } from '../helper/playAreaHelper';
 import { setInitialPaddlePosition, movePaddle } from '../helper/paddleHelper';
 
@@ -17,8 +17,6 @@ const Paddle: React.FC<PaddleProps> = ({ playAreaRef, paddleRef }) => {
 
     const playAreaDims = getPlayAreaDimensions(playAreaRef);
 
-    // console.log('Paddle component rendered!');
-
     useEffect(() => {
 
         let animationFrameId: number | null = null;
@@ -34,7 +32,10 @@ const Paddle: React.FC<PaddleProps> = ({ playAreaRef, paddleRef }) => {
                 const newLeft = Math.max(0, currentLeft - paddleSpeed);
                 // If there is an ongoing animation frame (stored in animationFrameId), it is canceled to prevent overlapping or redundant animations.
                 if (animationFrameId) cancelAnimationFrame(animationFrameId);
-                animationFrameId = requestAnimationFrame(() => movePaddle(paddleRef, newLeft));
+                animationFrameId = requestAnimationFrame(() => {
+                    movePaddle(paddleRef, newLeft)
+                    return
+                });
 
             } else if (event.key === 'ArrowRight') {
                 const newLeft = Math.min(playAreaDims.width - paddleWidth, currentLeft + paddleSpeed);
@@ -80,6 +81,7 @@ const Paddle: React.FC<PaddleProps> = ({ playAreaRef, paddleRef }) => {
         height: `${paddleHeight}px`,
         position: 'absolute',
         backgroundColor: 'black',
+        borderRadius: '10px',
         transition: 'left 0.1s linear', // Smooth transition for left property
     };
 
@@ -88,6 +90,7 @@ const Paddle: React.FC<PaddleProps> = ({ playAreaRef, paddleRef }) => {
             ref={paddleRef}
             className="paddle"
             style={paddleStyle}
+            data-testid="paddle" // for testing purposes
         ></div>
     );
 

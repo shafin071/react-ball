@@ -1,25 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import { getPlayAreaDimensions } from '../helper/playAreaHelper';
 import { getPaddleDimensions } from '../helper/paddleHelper';
-import {setInitialBallPosition, BallHelper} from '../helper/ballHelper';
-// import {setInitialBallPosition, moveBall} from '../helper/ballHelper';
+import { setInitialBallPosition, BallHelper } from '../helper/ballHelper';
 import { moveBallProps } from '../models/gameModels';
 import { useGameStore } from '../store/gameStore';
 
 
 interface BallProps {
     paddleRef: React.RefObject<HTMLDivElement | null>;
+    ballRef: React.RefObject<HTMLDivElement | null>;
     playAreaRef: React.RefObject<HTMLDivElement | null>;
     brickRefs: React.RefObject<(HTMLDivElement | null)[]>;
 }
 
-const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, brickRefs }) => {
-    const ballRef = useRef<HTMLDivElement>(null);
+const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs }) => {
     const diameter = 15; // Width of the ball
-    const velocity = useRef({ x: 3, y: 3 }); // Ball's velocity (speed and direction)
+    const velocity = useRef({ x: 4, y: 4 }); // Ball's velocity (speed and direction)
     const gameStore = useGameStore();
-    const gameLost = useGameStore((state) => state.gameLost);
-    const brickCount = useRef(0); 
+    const brickCount = useRef(0);
 
     const playAreaDims = getPlayAreaDimensions(playAreaRef);
 
@@ -34,25 +32,25 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, brickRefs }) => {
         let animationFrameId: number;
 
         const moveBallAnimation = () => {
-            if (gameLost) {
+            if (gameStore.gameLost) {
                 cancelAnimationFrame(animationFrameId);
                 return; // Exit the animation loop if the game is over
             }
 
             if (!ballRef.current || !paddleRef.current || !brickRefs.current) return;
-            
-            // console.log('brickRefs.current in Ball:', brickRefs.current);
-            const moveBallProps: moveBallProps = { ballRef, paddleRef, brickCount, brickRefs, playAreaDims, velocity, gameStore};
+
+            const moveBallProps: moveBallProps = { ballRef, paddleRef, brickCount, brickRefs, playAreaDims, velocity, gameStore };
             const ballHelper = new BallHelper(moveBallProps);
             ballHelper.moveBall(playAreaDims, brickRefs, brickCount);
-            // moveBall(moveBallProps); // Move the ball and check for collisions
 
             // Schedule the next frame
             animationFrameId = requestAnimationFrame(moveBallAnimation);
         };
 
         // Initialize ball position
-        if(gameLost) return; // Don't set initial position if the game is lost. ball position will be initialized when the game restarts.
+        if (gameStore.gameLost) {
+            return;
+        } // Don't set initial position if the game is lost. ball position will be initialized when the game restarts.
         const paddleDims = getPaddleDimensions(paddleRef);
         setInitialBallPosition(ballRef, playAreaDims, paddleDims);
 
@@ -63,17 +61,23 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, brickRefs }) => {
         return () => {
             cancelAnimationFrame(animationFrameId);
         };
-    }, [gameLost]);
+    }, [gameStore.gameLost]);
 
     const ballStyle: React.CSSProperties = {
         width: `${diameter}px`,
         height: `${diameter}px`,
         borderRadius: '50%',
-        backgroundColor: 'red',
+        backgroundColor: '#6063d0',
         position: 'absolute',
     };
 
-    return <div ref={ballRef} style={ballStyle}></div>;
+    return (
+        <div
+            ref={ballRef}
+            style={ballStyle}
+            data-testid="ball" // for testing purposes
+        ></div>
+    );
 };
 
 export default Ball;
