@@ -4,10 +4,21 @@ import './setupMocks';
 import PlayArea from '../../PlayArea';
 import { useGameStore } from '../../../store/gameStore';
 import { Gamestate } from '../../../models/gameModels';
+import { getPlayAreaDimensions } from '../../../helper/playAreaHelper';
 
 
 describe('PlayArea Component', () => {
     let mockGameStore: Gamestate;
+
+    // Mock play area dimensions
+    const mockPlayAreaDims = {
+        leftEdge: 600,
+        rightEdge: 1400,
+        topEdge: 100,
+        bottomEdge: 700,
+        width: 800,
+        height: 600,
+    }
 
     beforeEach(() => {
         // Mock gameStore
@@ -21,6 +32,9 @@ describe('PlayArea Component', () => {
             endGame: jest.fn(),
             setScore: jest.fn(),
         } as Gamestate;
+
+        // Mock play area dimensions
+        (getPlayAreaDimensions as jest.Mock).mockReturnValue({ ...mockPlayAreaDims });
 
         jest.clearAllMocks();
     });
@@ -89,8 +103,11 @@ describe('PlayArea Component', () => {
 
         render(<PlayArea />);
 
-        // Verify that the Bricks, Ball, and Paddle components are rendered
-        expect(screen.getByTestId('brick')).toBeInTheDocument();
+        // Verify that at least one brick is rendered
+        const bricks = screen.getAllByTestId('brick');
+        expect(bricks.length).toBeGreaterThan(0);
+
+        // Verify that the Ball, and Paddle components are rendered
         expect(screen.getByTestId('ball')).toBeInTheDocument();
         expect(screen.getByTestId('paddle')).toBeInTheDocument();
     });
