@@ -1,15 +1,26 @@
-name: Run Jest Tests
+name: Restrict PRs to Main and Run Jest Tests
 
 on:
   pull_request:
     branches:
-      - main # Run the workflow for pull requests targeting the main branch
-      - develop # Run the workflow for pull requests targeting the develop branch
+      - main # Target branch for the pull request
 
 jobs:
-  test:
+  validate-branch:
     runs-on: ubuntu-latest
 
+    steps:
+      # Step 1: Validate the source branch
+      - name: Validate source branch
+        run: |
+          if [ "${{ github.head_ref }}" != "develop" ]; then
+            echo "Pull requests to main are only allowed from the develop branch."
+            exit 1
+          fi
+        shell: bash
+        
+  unit-test:
+    runs-on: ubuntu-latest
     steps:
       # Step 1: Check out the repository
       - name: Checkout code
