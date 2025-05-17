@@ -12,12 +12,13 @@ export default function Bricks({ playAreaRef, brickRefs }: BricksProps) {
 
     const brickWidth = 60; // Width of each brick (px)
     const brickHeight = 30; // Height of each brick (px)
+    const padding = 5; // Padding between bricks (px)
 
     const playAreaDims = getPlayAreaDimensions(playAreaRef);
     const { brickSectionHeight, brickSectionWidth } = getBrickAreaDimensions(playAreaDims);
 
-    let rows = Math.floor(brickSectionHeight / (brickHeight + 5));
-    let bricksPerRow = Math.floor(brickSectionWidth / (brickWidth + 5));
+    let rows = Math.floor(brickSectionHeight / (brickHeight + padding));
+    let bricksPerRow = Math.floor(brickSectionWidth / (brickWidth + padding));
 
     // const rows = 1; // Number of rows
     // const bricksPerRow = 1; // Number of bricks per row
@@ -56,6 +57,7 @@ export default function Bricks({ playAreaRef, brickRefs }: BricksProps) {
                                     }
                                 }}
                                 id={brickKey.toString()}
+                                data-testid="brick" // for testing purposes
                             ></div>
                         )
                     })}

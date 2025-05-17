@@ -4,6 +4,9 @@ import PlayArea from './components/PlayArea';
 
 
 function App() {
+	// const width = 700
+    // const height = 500
+
 	const width = 800
     const height = 600
 

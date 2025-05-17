@@ -3,28 +3,44 @@ import { getPaddleDimensions } from './paddleHelper';
 import { getBrickAreaDimensions, getBrickDimensions } from "./brickHelper";
 
 
+/**
+ * Sets the initial position of the ball within the play area.
+ *
+ * @param {React.RefObject<HTMLDivElement | null>} ballRef - A reference to the ball DOM element.
+ * @param {PlayAreaDimensions} playAreaDims - The dimensions of the play area.
+ * @param {PaddleDimensions} paddleDims - The dimensions of the paddle.
+ *
+ * The ball is positioned horizontally at the center of the play area and vertically just above the paddle.
+ */
 const setInitialBallPosition = (ballRef: React.RefObject<HTMLDivElement | null>, playAreaDims: PlayAreaDimensions, paddleDims: PaddleDimensions) => {
+    // console.log('setInitialBallPosition called', ballRef.current, playAreaDims, paddleDims);
     if (ballRef.current) {
         ballRef.current.style.left = `${(playAreaDims.width) / 2}px`; // Center horizontally
         ballRef.current.style.top = `${paddleDims.topEdge - parseFloat(ballRef.current.style.width)}px`; // 40px from bottom edge
     }
 }
 
+/**
+ * A helper class to manage ball-related operations such as movement and collision handling.
+ */
 class BallHelper {
     private ballRef: React.RefObject<HTMLDivElement | null>;
     private paddleRef: React.RefObject<HTMLDivElement | null>;
-    // private brickRefs: React.RefObject<(HTMLDivElement | null)[]>;
     private velocity: { current: { x: number; y: number } };
     private gameStore: Gamestate;
 
     constructor(moveBallProps: moveBallProps) {
         this.ballRef = moveBallProps.ballRef;
         this.paddleRef = moveBallProps.paddleRef;
-        // this.brickRefs = moveBallProps.brickRefs;
         this.velocity = moveBallProps.velocity;
         this.gameStore = moveBallProps.gameStore;
     }
 
+    /**
+     * Retrieves the dimensions and position of the ball.
+     *
+     * @returns {BallDimensions} An object containing the ball's width, left edge, right edge, top edge, and bottom edge.
+     */
     getBallDimensions(): BallDimensions {
         if (this.ballRef.current) {
             const width = parseFloat(this.ballRef.current.style.width || '0');
@@ -38,6 +54,13 @@ class BallHelper {
         return { width: 0, leftEdge: 0, rightEdge: 0, topEdge: 0, bottomEdge: 0 };
     }
 
+    /**
+     * Handles collisions of the ball with the play area boundaries.
+     *
+     * @param {BallDimensions} ballDims - The dimensions of the ball.
+     * @param {PlayAreaDimensions} playAreaDims - The dimensions of the play area.
+     * @returns {boolean} Returns `true` if the ball hits the bottom boundary, otherwise `false`.
+     */
     handleBallCollisionWithBoundaries(ballDims: BallDimensions, playAreaDims: PlayAreaDimensions): boolean {
         // Check for collisions with left-right boundaries
         if (ballDims.leftEdge <= 0 || ballDims.rightEdge >= playAreaDims.width) {
@@ -62,6 +85,12 @@ class BallHelper {
         return false; // No collision with the bottom boundary
     }
 
+    /**
+     * Handles collisions of the ball with the paddle.
+     * The angle of the ball's bounce is determined by the zone of the paddle it hits.
+     *
+     * @param {BallDimensions} ballDims - The dimensions of the ball.
+     */
     handleBallCollisionWithPaddle(ballDims: BallDimensions): void {
         const paddleDims = getPaddleDimensions(this.paddleRef);
 
@@ -75,7 +104,7 @@ class BallHelper {
         if (
             this.velocity.current.y > 0 && // Ensure the ball is moving downward
             currentBottom >= paddleDims.topEdge &&
-            currentTop <= paddleDims.topEdge + paddleDims.paddleHeight &&
+            currentTop <= paddleDims.topEdge + paddleDims.height &&
             currentRight >= paddleDims.leftEdge &&
             currentLeft <= paddleDims.rightEdge
         ) {
@@ -85,7 +114,7 @@ class BallHelper {
             // Calculate the paddle center and ball center
             const paddleCenter = paddleDims.leftEdge + (paddleDims.rightEdge - paddleDims.leftEdge) / 2;
             const ballCenter = currentLeft + (currentRight - currentLeft) / 2;
-            console.log('paddleDims.leftEdge:', paddleDims.leftEdge, 'Paddle center:', paddleCenter, ' paddleDims.rightEdge:', paddleDims.rightEdge, ' Ball center:', ballCenter);
+            // console.log('paddleDims.leftEdge:', paddleDims.leftEdge, 'Paddle center:', paddleCenter, ' paddleDims.rightEdge:', paddleDims.rightEdge, ' Ball center:', ballCenter);
 
             // Paddle zones/edges and corresponding x directions of the ball:
             // Note: The paddle is divided into 5 zones to determine the angle at which the ball will bounce of the paddle.
@@ -97,50 +126,61 @@ class BallHelper {
             // A    B                C             Paddle center             D                E     F
 
             //                       | <-paddleWidth/8-> | <-paddleWidth/8-> |
-            
+
             const A = paddleDims.leftEdge;
             const F = paddleDims.rightEdge;
-            
+
             const C = paddleCenter - (paddleDims.width / 8);
             const D = paddleCenter + (paddleDims.width / 8);
 
             const B = A + (C - A) / 4;
             const E = F - (F - D) / 4;
 
-            console.log('A:', A, ' B:', B, ' C:', C, ' D:', D, ' E:', E, ' F:', F, ' currentLeft:', currentLeft, ' currentRight:', currentRight, ' ballCenter:', ballCenter);
+            // console.log('A:', A, ' B:', B, ' C:', C, ' D:', D, ' E:', E, ' F:', F, ' currentLeft:', currentLeft, ' currentRight:', currentRight, ' ballCenter:', ballCenter);
 
             if (currentRight >= A && ballCenter <= B) {
                 // Ball hit Left Zone 1
-                console.log('Ball hit Left Zone 1');
+                // console.log('Ball hit Left Zone 1');
                 this.velocity.current.x = -3;
             }
             else if (ballCenter > B && ballCenter <= C) {
                 // Ball hit Left Zone 2
-                console.log('Ball hit Left Zone 2');
+                // console.log('Ball hit Left Zone 2');
                 this.velocity.current.x = -2;
             }
             else if (ballCenter > C && ballCenter <= D) {
                 // Ball hit Center Zone
-                console.log('Ball hit Center Zone');
+                // console.log('Ball hit Center Zone');
                 this.velocity.current.x = 0;
             }
             else if (ballCenter > D && ballCenter <= E) {
                 // Ball hit Right Zone 2
-                console.log('Ball hit Right Zone 2');
+                // console.log('Ball hit Right Zone 2');
                 this.velocity.current.x = 2;
             }
             else if (ballCenter > E && currentLeft <= F) {
                 // Ball hit Right Zone 1
-                console.log('Ball hit Right Zone 1');
+                // console.log('Ball hit Right Zone 1');
                 this.velocity.current.x = 3;
             }
         }
 
     }
 
+    /**
+     * Handles collisions of the ball with bricks.
+     * When brick count reaches zero, it triggers a game win state.
+     *
+     * @param {PlayAreaDimensions} playAreaDims - The dimensions of the play area.
+     * @param {BallDimensions} ballDims - The dimensions of the ball.
+     * @param {React.RefObject<(HTMLDivElement | null)[]>} brickRefs - References to the brick DOM elements.
+     * @param {object} brickCount - An object containing the current count of bricks.
+     */
     handleBallCollisionWithBricks(playAreaDims: PlayAreaDimensions, ballDims: BallDimensions, brickRefs: React.RefObject<(HTMLDivElement | null)[]>, brickCount: { current: number }): void {
+        // console.log('brickCount:', brickCount.current, 'brickRefs:', brickRefs.current);
         for (let index = 0; index < brickRefs.current.length; index++) {
             const brick = brickRefs.current[index];
+            // console.log('brick:', brick.style.left, 'brick:', brick?.style.top);
 
             if (brick && this.ballRef.current) {
                 // Check if the brick already has the 'brick-exit' class
@@ -149,6 +189,7 @@ class BallHelper {
                 }
 
                 const brickDims = getBrickDimensions(brick, playAreaDims);
+                // console.log('ballDims:', ballDims, 'brickDims:', brickDims);
                 if (
                     ballDims.rightEdge >= brickDims.leftEdge &&
                     ballDims.leftEdge <= brickDims.rightEdge &&
@@ -192,6 +233,11 @@ class BallHelper {
         }
     }
 
+    /**
+     * Gradually slows down the ball when all bricks are destroyed.
+     *
+     * @param {object} brickCount - An object containing the current count of bricks.
+     */
     handleAllBricksDestroyed(brickCount: { current: number }): void {
         // Gradually slow down the ball at intervals if all bricks are destroyed
         if (brickCount.current <= 0) {
@@ -208,6 +254,13 @@ class BallHelper {
         }
     }
 
+    /**
+     * Moves the ball within the play area, handling collisions and updating its position.
+     *
+     * @param {PlayAreaDimensions} playAreaDims - The dimensions of the play area.
+     * @param {React.RefObject<(HTMLDivElement | null)[]>} brickRefs - References to the brick DOM elements.
+     * @param {object} brickCount - An object containing the current count of bricks.
+     */
     moveBall(playAreaDims: PlayAreaDimensions, brickRefs: React.RefObject<(HTMLDivElement | null)[]>, brickCount: { current: number }): void {
         if (!this.ballRef.current || !this.paddleRef.current || !brickRefs.current) return;
 
