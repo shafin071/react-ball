@@ -17,7 +17,7 @@ import { PlayAreaDimensions, PaddleDimensions } from "../models/gameModels";
  * If the `paddleRef` is null or the paddle element is not mounted, all values in the returned object will be `0`.
  */
 const getPaddleDimensions = (paddleRef: React.RefObject<HTMLDivElement | null>): PaddleDimensions => {
-    // console.log('Getting paddle dimensions', paddleRef.current);
+    console.log('Getting paddle dimensions in getPaddleDimensions: ', paddleRef.current);
     if (paddleRef.current) {
         const width = parseFloat(paddleRef.current.style.width || '0');
         const leftEdge = parseFloat(paddleRef.current.style.left || '0');
@@ -50,7 +50,7 @@ const setInitialPaddlePosition = (paddleRef: React.RefObject<HTMLDivElement | nu
         const initialTop = playAreaDims.height - paddleBottomPadding; 
         paddleRef.current.style.top = `${initialTop}px`;
         
-        // console.log('Setting initial position of paddle:', initialLeft, initialTop);
+        console.log('Setting initial position of paddle:', initialLeft, initialTop);
     }
 }
 

@@ -7,11 +7,11 @@ function App() {
 	// const width = 700
     // const height = 500
 
-	const width = 800
-    const height = 600
+	// const width = 800
+    // const height = 600
 
-	// const width = 1000
-    // const height = 800
+	const width = 1000
+    const height = 800
 
 	const playAreaContainerStyle: React.CSSProperties = {
 		width: width,
