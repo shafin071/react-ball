@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import './setupMocks';
 import PlayArea from '../../PlayArea';
@@ -27,8 +27,8 @@ describe('PlayArea Component', () => {
             gameStarted: false,
             gameWon: false,
             gameLost: false,
-            startGame: jest.fn(() => {}),
-            resetGame: jest.fn(() => {}),
+            startGame: jest.fn(() => { }),
+            resetGame: jest.fn(() => { }),
             endGame: jest.fn(),
             setScore: jest.fn(),
         } as Gamestate;
@@ -120,9 +120,25 @@ describe('PlayArea Component', () => {
 
         render(<PlayArea />);
 
-        // Verify that the Bricks, Ball, and Paddle components are rendered
+        // Verify that the Bricks, Ball, and Paddle components are not rendered
         expect(screen.queryByTestId('brick')).toBeNull();
         expect(screen.queryByTestId('ball')).toBeNull();
         expect(screen.queryByTestId('paddle')).toBeNull();
+    });
+
+    it('should render the Paddle component before the Ball component', async () => {
+        // Set gameStarted to true
+        mockGameStore.gameStarted = true;
+        mockGameStore.gameWon = false;
+        (useGameStore as unknown as jest.Mock).mockReturnValue(mockGameStore);
+
+        render(<PlayArea />);
+
+        // Wait for the Paddle and Ball components to render
+        const paddle = await waitFor(() => screen.getByTestId('paddle'));
+        const ball = await waitFor(() => screen.getByTestId('ball'));
+
+        // Verify that the Paddle component appears before the Ball component in the DOM
+        expect(paddle.compareDocumentPosition(ball) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
 });
