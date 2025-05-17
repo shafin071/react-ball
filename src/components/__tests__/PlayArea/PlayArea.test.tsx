@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import './setupMocks';
 import PlayArea from '../../PlayArea';
@@ -43,7 +43,13 @@ describe('PlayArea Component', () => {
         (useGameStore as unknown as jest.Mock).mockReturnValue(mockGameStore);
         render(<PlayArea />);
 
-        // Verify that the start game button is rendered and the game components are not rendered
+        // Verify that the score board and start game button are rendered and the game components are not rendered
+        const scoreBoard = screen.getByTestId('score-board');
+        expect(scoreBoard).toBeInTheDocument();
+
+        const scoreElement = within(scoreBoard).getByText(`${mockGameStore.score}`);
+        expect(scoreElement).toBeInTheDocument();
+
         const startButton = screen.getByText('Start Game');
         expect(startButton).toBeInTheDocument();
         expect(screen.queryByTestId('brick')).toBeNull();
@@ -55,9 +61,10 @@ describe('PlayArea Component', () => {
         expect(mockGameStore.startGame).toHaveBeenCalled();
     });
 
-    it('should render the game over message when the game is lost', () => {
+    it('should render the game over message and current score when the game is lost', () => {
         // Set gameLost to true
         mockGameStore.gameLost = true;
+        mockGameStore.score = 100;
         (useGameStore as unknown as jest.Mock).mockReturnValue(mockGameStore);
 
         render(<PlayArea />);
@@ -65,6 +72,12 @@ describe('PlayArea Component', () => {
         // Verify that the game over message is rendered
         const gameOverMessage = screen.getByText('Game Over!');
         expect(gameOverMessage).toBeInTheDocument();
+
+        // Verify that the current score is displayed
+        const scoreBoard = screen.getByTestId('score-board');
+        expect(scoreBoard).toBeInTheDocument();
+        const scoreElement = within(scoreBoard).getByText(`${mockGameStore.score}`);
+        expect(scoreElement).toBeInTheDocument();
 
         // Verify that the try again button is rendered
         const tryAgainButton = screen.getByText('Try again');
@@ -78,9 +91,16 @@ describe('PlayArea Component', () => {
     it('should render the game won message when the game is won', () => {
         // Set gameWon to true
         mockGameStore.gameWon = true;
+        mockGameStore.score = 360;
         (useGameStore as unknown as jest.Mock).mockReturnValue(mockGameStore);
 
         render(<PlayArea />);
+
+        // Verify that the current score is displayed
+        const scoreBoard = screen.getByTestId('score-board');
+        expect(scoreBoard).toBeInTheDocument();
+        const scoreElement = within(scoreBoard).getByText(`${mockGameStore.score}`);
+        expect(scoreElement).toBeInTheDocument();
 
         // Verify that the game won message is rendered
         const gameWonMessage = screen.getByText('You Won!');
@@ -103,6 +123,12 @@ describe('PlayArea Component', () => {
 
         render(<PlayArea />);
 
+        // Verify that the current score is displayed
+        const scoreBoard = screen.getByTestId('score-board');
+        expect(scoreBoard).toBeInTheDocument();
+        const scoreElement = within(scoreBoard).getByText(`${mockGameStore.score}`);
+        expect(scoreElement).toBeInTheDocument();
+
         // Verify that at least one brick is rendered
         const bricks = screen.getAllByTestId('brick');
         expect(bricks.length).toBeGreaterThan(0);
@@ -119,6 +145,12 @@ describe('PlayArea Component', () => {
         (useGameStore as unknown as jest.Mock).mockReturnValue(mockGameStore);
 
         render(<PlayArea />);
+
+        // Verify that the current score is displayed
+        const scoreBoard = screen.getByTestId('score-board');
+        expect(scoreBoard).toBeInTheDocument();
+        const scoreElement = within(scoreBoard).getByText(`${mockGameStore.score}`);
+        expect(scoreElement).toBeInTheDocument();
 
         // Verify that the Bricks, Ball, and Paddle components are not rendered
         expect(screen.queryByTestId('brick')).toBeNull();

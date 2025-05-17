@@ -6,7 +6,7 @@ const ScoreBoard: React.FC = () => {
     const gameStore = useGameStore();
 
     return (
-        <div className="score-board">
+        <div className="score-board" data-testid="score-board">
             <span>Score:</span>
             <span>{gameStore.score}</span>
         </div>
