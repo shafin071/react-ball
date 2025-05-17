@@ -41,7 +41,6 @@ describe('Paddle Component', () => {
         // Mock play area dimensions
         (getPlayAreaDimensions as jest.Mock).mockReturnValue({ ...mockPlayAreaDims });
 
-
         // Mock requestAnimationFrame
         requestAnimationFrameMock = jest
             .spyOn(global, 'requestAnimationFrame')

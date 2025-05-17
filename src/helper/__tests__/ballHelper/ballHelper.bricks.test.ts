@@ -16,6 +16,7 @@ describe('BallHelper collision with bricks', () => {
     let velocity: { current: { x: number; y: number } };
     let gameStore: Gamestate;
     let ballHelper: BallHelper;
+    let brickPoint = 10
 
     // Mock play area dimensions
     const playAreaDims = {
@@ -48,6 +49,10 @@ describe('BallHelper collision with bricks', () => {
         brick.style.height = `${mockBrickDims.height}px`;
         brick.style.left = `${mockBrickDims.leftEdge}px`;
         brick.style.top = `${mockBrickDims.topEdge}px`;
+
+        // Assign a point value to the brick using the dataset property
+        brick.dataset.score = `${brickPoint}`; // Assign the score to the brick
+
         brickRefs = { current: [brick] };
 
         // Mock the getBrickDimensions function to return the mock dimensions
@@ -92,6 +97,9 @@ describe('BallHelper collision with bricks', () => {
 
             // Assert that the brickCount is decremented
             expect(brickCount.current).toBe(9);
+
+            // Assert that the score is updated
+            expect(gameStore.setScore).toHaveBeenCalledWith(brickPoint);
         });
 
     it.each([
@@ -120,6 +128,9 @@ describe('BallHelper collision with bricks', () => {
 
             // Assert that the brickCount is decremented
             expect(brickCount.current).toBe(9);
+
+            // Assert that the score is updated
+            expect(gameStore.setScore).toHaveBeenCalledWith(brickPoint);
         });
 
     it.each([
@@ -150,6 +161,9 @@ describe('BallHelper collision with bricks', () => {
             // Assert that the brickCount is decremented
             expect(brickCount.current).toBe(9);
 
+            // Assert that the score is updated
+            expect(gameStore.setScore).toHaveBeenCalledWith(brickPoint);
+
         });
 
     it.each([
@@ -178,6 +192,9 @@ describe('BallHelper collision with bricks', () => {
 
             // Assert that the brickCount is decremented
             expect(brickCount.current).toBe(9);
+
+            // Assert that the score is updated
+            expect(gameStore.setScore).toHaveBeenCalledWith(brickPoint);
         });
 
     it.each([
@@ -211,6 +228,9 @@ describe('BallHelper collision with bricks', () => {
 
             // Assert that the brickCount is decremented
             expect(brickCount.current).toBe(0);
+
+            // Assert that the score is updated
+            expect(gameStore.setScore).toHaveBeenCalledWith(brickPoint);
         });
 
 });

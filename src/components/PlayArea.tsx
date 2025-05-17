@@ -11,6 +11,7 @@ import { useGameStore } from '../store/gameStore';
 const PlayArea: React.FC = () => {
     const playAreaRef = useRef<HTMLDivElement>(null);
     const paddleRef = useRef<HTMLDivElement>(null);
+    const ballRef = useRef<HTMLDivElement>(null);
     const brickRefs = useRef<(HTMLDivElement | null)[]>([]);
     const gameStore = useGameStore();
 
@@ -67,7 +68,7 @@ const PlayArea: React.FC = () => {
                 {(gameStore.gameStarted && !gameStore.gameWon) && (
                     <>
                         <Bricks playAreaRef={playAreaRef} brickRefs={brickRefs} />
-                        <Ball playAreaRef={playAreaRef} paddleRef={paddleRef} brickRefs={brickRefs} />
+                        <Ball playAreaRef={playAreaRef} paddleRef={paddleRef} ballRef={ballRef} brickRefs={brickRefs} />
                         <Paddle playAreaRef={playAreaRef} paddleRef={paddleRef} />
                     </>
                 )}
