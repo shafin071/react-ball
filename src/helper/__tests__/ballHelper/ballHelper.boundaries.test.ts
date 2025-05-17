@@ -7,7 +7,6 @@ describe('BallHelper collision with playArea boundaries', () => {
     let ballRef: React.RefObject<HTMLDivElement>;
     let paddleRef: React.RefObject<HTMLDivElement>;
     let brickRefs: React.RefObject<(HTMLDivElement | null)[]>;
-    let velocity: { current: { x: number; y: number } };
     let gameStore: Gamestate;
     let ballHelper: BallHelper;
 
