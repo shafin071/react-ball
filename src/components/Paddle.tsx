@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { getPlayAreaDimensions } from '../helper/playAreaHelper';
 import { setInitialPaddlePosition, movePaddle } from '../helper/paddleHelper';
 
@@ -67,11 +67,11 @@ const Paddle: React.FC<PaddleProps> = ({ playAreaRef, paddleRef }) => {
 
         // Cleanup event listener on component unmount
         return () => {
-            console.log('Cleaning up event listeners!');
+            // console.log('Cleaning up event listeners!');
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('mousemove', handleMouseMove);
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            console.log('Animation frame canceled:', animationFrameId);
+            // console.log('Animation frame canceled:', animationFrameId);
         };
     }, []);
 

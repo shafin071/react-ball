@@ -13,7 +13,9 @@ import { getBrickAreaDimensions, getBrickDimensions } from "./brickHelper";
  * The ball is positioned horizontally at the center of the play area and vertically just above the paddle.
  */
 const setInitialBallPosition = (ballRef: React.RefObject<HTMLDivElement | null>, playAreaDims: PlayAreaDimensions, paddleDims: PaddleDimensions) => {
-    // console.log('setInitialBallPosition called', ballRef.current, playAreaDims, paddleDims);
+    console.log('setInitialBallPosition called', ballRef.current);
+    console.log('setInitialBallPosition called', playAreaDims);
+    console.log('setInitialBallPosition called', paddleDims);
     if (ballRef.current) {
         ballRef.current.style.left = `${(playAreaDims.width) / 2}px`; // Center horizontally
         ballRef.current.style.top = `${paddleDims.topEdge - parseFloat(ballRef.current.style.width)}px`; // 40px from bottom edge

@@ -34,13 +34,13 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs 
     }, [brickRefs.current]);
 
     useEffect(() => {
-        console.log('in ball useEffect')
+        // console.log('in ball useEffect')
         let animationFrameId: number;
 
         const moveBallAnimation = () => {
-            console.log('in moveBallAnimation');
+            // console.log('in moveBallAnimation');
             if (gameStore.gameLost) {
-                console.log('game lost... canceling animation frame');
+                // console.log('game lost... canceling animation frame');
                 cancelAnimationFrame(animationFrameId);
                 return; // Exit the animation loop if the game is over
             }
@@ -55,13 +55,13 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs 
 
             // Schedule the next frame
             animationFrameId = requestAnimationFrame(moveBallAnimation);
-            console.log('animationFrameId in Ball:', animationFrameId);
+            // console.log('animationFrameId in Ball:', animationFrameId);
         };
 
         // Initialize ball position
         // console.log('gameLost in Ball useEffect:', gameLost);
         if (gameStore.gameLost) {
-            console.log('if gamelost if loop:', gameStore.gameLost);
+            // console.log('if gamelost if loop:', gameStore.gameLost);
             return;
         } // Don't set initial position if the game is lost. ball position will be initialized when the game restarts.
         const paddleDims = getPaddleDimensions(paddleRef);
@@ -73,7 +73,7 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs 
 
         // Cleanup on component unmount
         return () => {
-            console.log('Cleaning up animation frame in Ball', animationFrameId);
+            // console.log('Cleaning up animation frame in Ball', animationFrameId);
             cancelAnimationFrame(animationFrameId);
         };
     }, [gameStore.gameLost]);

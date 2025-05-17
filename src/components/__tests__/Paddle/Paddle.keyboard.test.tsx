@@ -21,7 +21,6 @@ describe('Paddle Component', () => {
     }
 
     const mockPaddleSpeed = 60; // Mock paddle speed
-    const mockPaddleBottomPadding = 20; // Mock bottom padding
 
     // Mock play area dimensions
     const mockPlayAreaDims = {
