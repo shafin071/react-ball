@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { getPlayAreaDimensions } from '../helper/playAreaHelper';
 import { setInitialPaddlePosition, movePaddle } from '../helper/paddleHelper';
 
@@ -16,8 +16,6 @@ const Paddle: React.FC<PaddleProps> = ({ playAreaRef, paddleRef }) => {
     const paddleSpeed = 60; // Speed of paddle movement
 
     const playAreaDims = getPlayAreaDimensions(playAreaRef);
-
-    // console.log('Paddle component rendered!', playAreaDims);
 
     useEffect(() => {
 
@@ -67,11 +65,9 @@ const Paddle: React.FC<PaddleProps> = ({ playAreaRef, paddleRef }) => {
 
         // Cleanup event listener on component unmount
         return () => {
-            console.log('Cleaning up event listeners!');
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('mousemove', handleMouseMove);
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            console.log('Animation frame canceled:', animationFrameId);
         };
     }, []);
 

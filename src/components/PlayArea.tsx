@@ -15,8 +15,6 @@ const PlayArea: React.FC = () => {
     const brickRefs = useRef<(HTMLDivElement | null)[]>([]);
     const gameStore = useGameStore();
 
-    // console.log('PlayArea component rendered!', gameStore);
-
     return (
         <>
             <ScoreBoard />

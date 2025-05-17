@@ -27,8 +27,8 @@ describe('PlayArea Component', () => {
             gameStarted: false,
             gameWon: false,
             gameLost: false,
-            startGame: jest.fn(() => { console.log('mock startGame called') }),
-            resetGame: jest.fn(() => { console.log('mock resetGame called') }),
+            startGame: jest.fn(() => {}),
+            resetGame: jest.fn(() => {}),
             endGame: jest.fn(),
             setScore: jest.fn(),
         } as Gamestate;
