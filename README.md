@@ -1,7 +1,7 @@
 # React Ball Game 🎮
 
 A fun and interactive brick-breaking game built with React, TypeScript, and Vite. Use the paddle to bounce the ball, break all the bricks, and win the game! 🏆
-
+Currently suited for desktop only.
 ---
 
 ## Table of Contents
