@@ -65,9 +65,9 @@
 }
 
 .play-area-container {
-	width: 1000px;
+	width: 800px;
 	/* Set a fixed width for the play area */
-	height: 860px;
+	height: 600px;
 	/* Set a fixed height for the play area */
 }
 
