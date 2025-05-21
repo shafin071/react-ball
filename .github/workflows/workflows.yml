@@ -4,14 +4,16 @@ on:
   pull_request:
     branches:
       - main # Target branch for the pull request
+      - develop # Allow PRs to develop from any branch
 
 jobs:
   validate-branch:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Validate the source branch
-      - name: Validate source branch
+      # Step 1: Validate the source branch for PRs to main
+      - name: Validate source branch for PRs to main
+        if: github.event.pull_request.base.ref == 'main' # Only run this step for PRs to main
         run: |
           if [ "${{ github.head_ref }}" != "develop" ]; then
             echo "Pull requests to main are only allowed from the develop branch."
