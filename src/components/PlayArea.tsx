@@ -11,17 +11,10 @@ import GameRules from './GameRules';
 
 const PlayArea: React.FC = () => {
     const playAreaRef = useRef<HTMLDivElement>(null);
-    const gameRulesRef = useRef<HTMLDialogElement | null>(null);
     const paddleRef = useRef<HTMLDivElement>(null);
     const ballRef = useRef<HTMLDivElement>(null);
     const brickRefs = useRef<(HTMLDivElement | null)[]>([]);
     const gameStore = useGameStore();
-
-    // const handleShowGameRules = () => {
-    //     if (gameRulesRef.current) {
-    //         gameRulesRef.current.showModal();
-    //     }
-    // }
 
     const handleStartGame = () => {
         gameStore.startGame();
@@ -36,7 +29,6 @@ const PlayArea: React.FC = () => {
             <ScoreBoard />
             <div id="confetti-container"></div>
             <div className='play-area' ref={playAreaRef}>
-                <div id='modal'></div>
                 {!gameStore.gameStarted && (
                     <div className="game-intro">
                         <button className="btn btn-primary game-btn start-game-btn" onClick={handleStartGame}>
@@ -90,6 +82,7 @@ const PlayArea: React.FC = () => {
                         <Ball playAreaRef={playAreaRef} paddleRef={paddleRef} ballRef={ballRef} brickRefs={brickRefs} />
                     </>
                 )}
+
             </div>
         </div>
     )
