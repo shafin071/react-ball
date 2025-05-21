@@ -39,7 +39,7 @@ describe('PlayArea Component', () => {
         jest.clearAllMocks();
     });
 
-    it('should render the start game button when game has not started', () => {
+    it('should render the start game and game rules buttons when game has not started', () => {
         (useGameStore as unknown as jest.Mock).mockReturnValue(mockGameStore);
         render(<PlayArea />);
 
@@ -52,6 +52,10 @@ describe('PlayArea Component', () => {
 
         const startButton = screen.getByText('Start Game');
         expect(startButton).toBeInTheDocument();
+
+        const gameRulesButton = screen.getByTestId('game-rules-btn');
+        expect(gameRulesButton).toBeInTheDocument();
+
         expect(screen.queryByTestId('brick')).toBeNull();
         expect(screen.queryByTestId('ball')).toBeNull();
         expect(screen.queryByTestId('paddle')).toBeNull();
@@ -136,6 +140,20 @@ describe('PlayArea Component', () => {
         // Verify that the Ball, and Paddle components are rendered
         expect(screen.getByTestId('ball')).toBeInTheDocument();
         expect(screen.getByTestId('paddle')).toBeInTheDocument();
+    });
+
+    it('should not open the game rules modal when play area is first loaded', () => {
+        // Create modal div
+        const modalRoot = document.createElement('div');
+        modalRoot.setAttribute('id', 'modal');
+        document.body.appendChild(modalRoot);
+
+        (useGameStore as unknown as jest.Mock).mockReturnValue(mockGameStore);
+        render(<PlayArea />);
+        const dialog = screen.getByTestId('modal');
+        expect(getComputedStyle(dialog).display).toBe('none');
+
+        document.body.removeChild(modalRoot);
     });
 
     it('egde case: should not render the game components when the gameStarted and gameWon are both true', () => {

@@ -6,6 +6,7 @@ import Bricks from './Bricks';
 import ScoreBoard from './ScoreBoard';
 import Confetti from './Confetti';
 import { useGameStore } from '../store/gameStore';
+import GameRules from './GameRules';
 
 
 const PlayArea: React.FC = () => {
@@ -15,15 +16,26 @@ const PlayArea: React.FC = () => {
     const brickRefs = useRef<(HTMLDivElement | null)[]>([]);
     const gameStore = useGameStore();
 
+    const handleStartGame = () => {
+        gameStore.startGame();
+    }
+
+    const handleResetGame = () => {
+        gameStore.resetGame();
+    }
+
     return (
-        <>
+        <div className="play-area-container">
             <ScoreBoard />
             <div id="confetti-container"></div>
             <div className='play-area' ref={playAreaRef}>
                 {!gameStore.gameStarted && (
-                    <button className="btn btn-primary start-game-btn" onClick={() => gameStore.startGame()}>
-                        Start Game
-                    </button>
+                    <div className="game-intro">
+                        <button className="btn btn-primary game-btn start-game-btn" onClick={handleStartGame}>
+                            Start Game
+                        </button>
+                        <GameRules />
+                    </div>
                 )}
                 {gameStore.gameLost && (
                     <div className="game-over-message-div">
@@ -35,7 +47,7 @@ const PlayArea: React.FC = () => {
                                 scale: { type: "spring", visualDuration: 0.4, bounce: 0.5 },
                             }}>
                             <h2>Game Over!</h2>
-                            <button className="btn btn-primary" onClick={() => gameStore.resetGame()}>
+                            <button className="btn btn-primary game-btn" onClick={handleResetGame}>
                                 Try again
                             </button>
                         </motion.div>
@@ -54,7 +66,7 @@ const PlayArea: React.FC = () => {
                                     scale: { type: "spring", visualDuration: 0.4, bounce: 0.5 },
                                 }}>
                                 <h2>You Won!</h2>
-                                <button className="btn btn-primary" onClick={() => gameStore.resetGame()}>
+                                <button className="btn btn-primary game-btn" onClick={handleResetGame}>
                                     Play again
                                 </button>
                             </motion.div>
@@ -70,9 +82,9 @@ const PlayArea: React.FC = () => {
                         <Ball playAreaRef={playAreaRef} paddleRef={paddleRef} ballRef={ballRef} brickRefs={brickRefs} />
                     </>
                 )}
-            </div>
-        </>
 
+            </div>
+        </div>
     )
 }
 
