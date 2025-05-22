@@ -191,9 +191,10 @@ class BallHelper {
 
                     const minDistance = Math.min(ballFromTop, ballFromBottom, ballFromLeft, ballFromRight);
 
+                    // Update ball velocity based on collision side
                     if (minDistance === ballFromTop || minDistance === ballFromBottom) {
                         this.velocity.current.y *= -1; // Reverse vertical direction
-                    } else {
+                    } else if (minDistance === ballFromLeft || minDistance === ballFromRight) {
                         this.velocity.current.x *= -1; // Reverse horizontal direction
                     }
 
@@ -215,7 +216,7 @@ class BallHelper {
                             console.log('Game won');
                         }, 500);
                     }
-                    break;
+                    // break;
                 }
             }
 
