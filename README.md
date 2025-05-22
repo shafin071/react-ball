@@ -9,6 +9,7 @@ Currently suited for desktop only.
 - [Game Rules](#game-rules)
 - [Technologies Used](#technologies-used)
 - [License](#license)
+- [Acknowledgments](#acknowledgments)
 
 ---
 
@@ -47,5 +48,11 @@ Currently suited for desktop only.
 This project is licensed under a **Proprietary License**. Unauthorized copying, distribution, modification, or use of this project, in whole or in part, is strictly prohibited without prior written permission from the author.
 
 For more details, please contact [shafinmohammed@gmail.com].
+
+
+## Acknowledgments
+Inspired by classic brick-breaking games like DX-Ball.
+
+Special thanks to the open-source community for the amazing tools and libraries used in this project.
 
 ---

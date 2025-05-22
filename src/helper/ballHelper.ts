@@ -200,16 +200,19 @@ class BallHelper {
                     // Handle brick removal
                     brick.classList.add('brick-exit');
                     brickCount.current -= 1;
+                    console.log('brickCount.current: ', brickCount.current);
                     const brickPoint = parseInt(brick.dataset.score || '0', 10);
                     this.gameStore.setScore(brickPoint);
 
                     setTimeout(() => {
                         brick.style.visibility = 'hidden';
-                    }, 200);
+                    }, 100);
 
                     if (brickCount.current <= 0) {
+                        console.log('All bricks destroyed. Brick count is 0');
                         setTimeout(() => {
                             this.gameStore.endGame(true);
+                            console.log('Game won');
                         }, 500);
                     }
                     break;
