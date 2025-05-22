@@ -200,6 +200,9 @@ class BallHelper {
                         this.velocity.current.y *= -1; // Reverse vertical direction
                     } else if (minDistance === ballFromLeft || minDistance === ballFromRight) {
                         this.velocity.current.x *= -1; // Reverse horizontal direction
+                    } else {
+                        this.velocity.current.y *= -1; // Reverse vertical direction
+                        this.velocity.current.x *= 0; // Drop the ball in straight line
                     }
 
                     // Handle brick removal
