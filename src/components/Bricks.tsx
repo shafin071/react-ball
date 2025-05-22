@@ -19,6 +19,9 @@ export default function Bricks({ playAreaRef, brickRefs }: BricksProps) {
     let rows = Math.floor(brickSectionHeight / (brickHeight + padding));
     let bricksPerRow = Math.floor(brickSectionWidth / (brickWidth + padding));
 
+    // let rows = 1
+    // let bricksPerRow = 2
+
     const brickStyle: React.CSSProperties = {
         width: `${brickWidth}px`,
         height: `${brickHeight}px`,

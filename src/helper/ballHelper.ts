@@ -13,9 +13,9 @@ import { getBrickAreaDimensions, getBrickDimensions } from "./brickHelper";
  * The ball is positioned horizontally at the center of the play area and vertically just above the paddle.
  */
 const setInitialBallPosition = (ballRef: React.RefObject<HTMLDivElement | null>, playAreaDims: PlayAreaDimensions, paddleDims: PaddleDimensions) => {
-    console.log('ballRef.current: ', ballRef.current);
-    console.log('playAreaDims in Ball: ', playAreaDims);
-    console.log('paddleDims in Ball:', paddleDims);
+    // console.log('ballRef.current: ', ballRef.current);
+    // console.log('playAreaDims in Ball: ', playAreaDims);
+    // console.log('paddleDims in Ball:', paddleDims);
     if (ballRef.current) {
         ballRef.current.style.left = `${(playAreaDims.width) / 2}px`; // Center horizontally
         ballRef.current.style.top = `${paddleDims.topEdge - parseFloat(ballRef.current.style.width)}px`; // 40px from bottom edge
@@ -203,16 +203,19 @@ class BallHelper {
                     // Handle brick removal
                     brick.classList.add('brick-exit');
                     brickCount.current -= 1;
+                    console.log('brickCount.current: ', brickCount.current);
                     const brickPoint = parseInt(brick.dataset.score || '0', 10);
                     this.gameStore.setScore(brickPoint);
 
                     setTimeout(() => {
                         brick.style.visibility = 'hidden';
-                    }, 200);
+                    }, 100);
 
                     if (brickCount.current <= 0) {
+                        console.log('All bricks destroyed. Brick count is 0');
                         setTimeout(() => {
                             this.gameStore.endGame(true);
+                            console.log('Game won');
                         }, 500);
                     }
                     break;
