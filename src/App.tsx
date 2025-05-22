@@ -4,29 +4,12 @@ import PlayArea from './components/PlayArea';
 
 
 function App() {
-	// const width = 700
-    // const height = 500
-
-	// const width = 800
-    // const height = 600
-
-	const width = 1000
-    const height = 800
-
-	const playAreaContainerStyle: React.CSSProperties = {
-		width: width,
-		height: height,
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginTop: '40px',
-	}
-
 	return (
-		<div className='play-area-container' style={playAreaContainerStyle}>
-			<PlayArea />
-		</div>
+		<>
+			<div className='react-ball-div'>
+				<PlayArea />
+			</div >
+		</>
 	)
 }
 

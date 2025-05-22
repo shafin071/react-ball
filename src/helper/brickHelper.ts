@@ -15,7 +15,7 @@ import { PlayAreaDimensions, BrickAreaDimensions, BrickDimensions } from "../mod
  */
 const getBrickAreaDimensions = (playAreaDims: PlayAreaDimensions): BrickAreaDimensions => {
     const brickAreaHeightRatio = 6; // Ratio of the height of the brick section to the height of the play area
-        const brickSectionHeight = playAreaDims.height / brickAreaHeightRatio // 3
+        const brickSectionHeight = playAreaDims.height / brickAreaHeightRatio
         const brickSectionWidth = playAreaDims.width
         return {brickSectionHeight, brickSectionWidth}
 }

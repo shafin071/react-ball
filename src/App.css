@@ -3,7 +3,7 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	font-family: 'Consolas', monospace; /* Apply Consolas font */
+	font-family: 'Consolas', monospace;
 }
 
 .logo {
@@ -51,39 +51,29 @@
 	}
 }
 
-.play-area {
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    position: relative;
-    border: 2px solid black;
-    overflow: hidden;
+.react-ball-div {
+	height: 100vh;
+	/* Full viewport height */
+	width: 100vw;
+	/* Full viewport width */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	/* Ensures child elements are positioned relative to this container */
 }
 
-.start-game-btn {
-    position: absolute; 
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -50%);
-    padding: 10px 20px;
-    font-size: 20px;
-    cursor: pointer;
-    z-index: 10;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease;
-	font-weight: bold;
-}
-
-.start-game-btn:hover {
-    background-color: #0056b3;
+.play-area-container {
+	width: 800px;
+	/* Set a fixed width for the play area */
+	height: 600px;
+	/* Set a fixed height for the play area */
 }
 
 .score-board {
 	width: 100%;
+	height: 60px;
 	position: relative;
 	margin: 0 auto;
 	display: flex;
@@ -94,7 +84,57 @@
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	font-weight: bold;
-    font-size: 25px;
+	font-size: 25px;
+}
+
+.play-area {
+	justify-content: center;
+	width: 100%;
+	height: calc(100% - 60px);
+	box-sizing: border-box;
+	position: relative;
+	border: 2px solid black;
+	overflow: hidden;
+}
+
+.game-intro {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: flex;
+	/* Use flexbox for layout */
+	flex-direction: column;
+	/* Stack buttons vertically */
+	align-items: center;
+	/* Center align the buttons */
+	gap: 10px;
+}
+
+.game-btn {
+	font-size: 20px;
+	font-weight: bold;
+	padding: 10px 20px;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.start-game-btn {
+	background-color: #007bff;
+}
+
+.start-game-btn:hover {
+	background-color: #0056b3;
+}
+
+.game-rules-btn {
+	background-color: #8648cb;
+}
+
+.game-rules-btn:hover {
+	background-color: #54238b;
 }
 
 .game-over-message-div,
@@ -113,6 +153,79 @@
 	padding: 20px;
 	border-radius: 10px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal dialog styling */
+.modal {
+	font-size: 20px;
+	font-family: 'Consolas', monospace;
+	background-color: white;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	z-index: 1000;
+	max-width: 900px;
+	max-height: 560px;
+	animation: fade-slide-up 0.3s ease-out forwards;
+}
+
+@keyframes fade-slide-up {
+	from {
+		opacity: 0;
+		transform: translateY(4rem);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.modal.fade-slide-down {
+	animation: fade-slide-down 0.3s ease-out forwards;
+	/* Closing animation */
+}
+
+@keyframes fade-slide-down {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	to {
+		opacity: 0;
+		transform: translateY(4rem);
+	}
+}
+
+.modal-body {
+	flex: 1;
+	/* Allow the content to take up available space */
+	overflow-y: auto;
+	/* Enable vertical scrolling if content overflows */
+}
+
+/* Modal backdrop styling */
+.modal::backdrop {
+	background-color: rgba(0, 0, 0, 0.5);
+	/* Dim the background */
+	backdrop-filter: blur(2px);
+	/* Optional: Add a blur effect */
+}
+
+/* Close button styling */
+.close-modal-button {
+	margin-top: 40px;
+	padding: 10px 20px;
+	background-color: #8648cb;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.close-modal-button:hover {
+	background-color: #54238b;
 }
 
 .brick-container {
@@ -138,16 +251,19 @@
 }
 
 .brick-exit {
-    animation: brick-fade-out 0.2s ease forwards; /* 0.5s animation */
+	animation: brick-fade-out 0.2s ease forwards;
+	/* 0.5s animation */
 }
 
 @keyframes brick-fade-out {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.5); /* Shrink the brick */
-    }
+	0% {
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	100% {
+		opacity: 0;
+		transform: scale(0.5);
+		/* Shrink the brick */
+	}
 }

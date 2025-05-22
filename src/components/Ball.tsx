@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { getPlayAreaDimensions } from '../helper/playAreaHelper';
 import { getPaddleDimensions } from '../helper/paddleHelper';
 import { setInitialBallPosition, BallHelper } from '../helper/ballHelper';
-// import {setInitialBallPosition, moveBall} from '../helper/ballHelper';
 import { moveBallProps } from '../models/gameModels';
 import { useGameStore } from '../store/gameStore';
 
@@ -15,16 +14,12 @@ interface BallProps {
 }
 
 const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs }) => {
-    // const ballRef = useRef<HTMLDivElement>(null);
     const diameter = 15; // Width of the ball
     const velocity = useRef({ x: 6, y: 6 }); // Ball's velocity (speed and direction)
     const gameStore = useGameStore();
-    // const gameLost = useGameStore((state) => state.gameLost);
     const brickCount = useRef(0);
 
     const playAreaDims = getPlayAreaDimensions(playAreaRef);
-    // console.log('playAreaDims in Ball:', playAreaDims);
-    // console.log('gameLost in Ball:', gameStore.gameLost);
 
     // Dynamically update brickCount when brickRefs.current changes
     useEffect(() => {
@@ -47,11 +42,9 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs 
 
             if (!ballRef.current || !paddleRef.current || !brickRefs.current) return;
 
-            // console.log('brickRefs.current in Ball:', brickRefs.current);
             const moveBallProps: moveBallProps = { ballRef, paddleRef, brickCount, brickRefs, playAreaDims, velocity, gameStore };
             const ballHelper = new BallHelper(moveBallProps);
             ballHelper.moveBall(playAreaDims, brickRefs, brickCount);
-            // moveBall(moveBallProps); // Move the ball and check for collisions
 
             // Schedule the next frame
             animationFrameId = requestAnimationFrame(moveBallAnimation);
@@ -59,13 +52,11 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs 
         };
 
         // Initialize ball position
-        // console.log('gameLost in Ball useEffect:', gameLost);
         if (gameStore.gameLost) {
             // console.log('if gamelost if loop:', gameStore.gameLost);
             return;
         } // Don't set initial position if the game is lost. ball position will be initialized when the game restarts.
         const paddleDims = getPaddleDimensions(paddleRef);
-        // console.log('paddleDims in Ball:', paddleDims);
         setInitialBallPosition(ballRef, playAreaDims, paddleDims);
 
         // Start the animation
@@ -86,8 +77,6 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs 
         position: 'absolute',
         // transform: `translate(${velocity.current.x}px, ${velocity.current.y}px)`, 
     };
-
-    // console.log('ballRef in Ball:', ballRef.current);
 
     return (
         <div

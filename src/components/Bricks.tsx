@@ -1,7 +1,6 @@
 import React from 'react';
 import { getPlayAreaDimensions } from '../helper/playAreaHelper';
 import { getBrickAreaDimensions } from '../helper/brickHelper';
-// import './Bricks.css'; // Ensure you have a CSS file for styling
 
 interface BricksProps {
     playAreaRef: React.RefObject<HTMLDivElement | null>;
@@ -19,10 +18,6 @@ export default function Bricks({ playAreaRef, brickRefs }: BricksProps) {
 
     let rows = Math.floor(brickSectionHeight / (brickHeight + padding));
     let bricksPerRow = Math.floor(brickSectionWidth / (brickWidth + padding));
-
-    // const rows = 1; // Number of rows
-    // const bricksPerRow = 1; // Number of bricks per row
-    // console.log('playAreaDims.height: ', playAreaDims.height, 'no. of rows:', rows, 'playAreaDims.width: ', playAreaDims.width, 'bricksPerRow:', bricksPerRow);
 
     const brickStyle: React.CSSProperties = {
         width: `${brickWidth}px`,

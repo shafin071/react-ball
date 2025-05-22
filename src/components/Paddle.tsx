@@ -17,8 +17,6 @@ const Paddle: React.FC<PaddleProps> = ({ playAreaRef, paddleRef }) => {
 
     const playAreaDims = getPlayAreaDimensions(playAreaRef);
 
-    // console.log('Paddle component rendered!', playAreaDims);
-
     useEffect(() => {
 
         let animationFrameId: number | null = null;
