@@ -184,10 +184,14 @@ class BallHelper {
                     ballDims.topEdge <= brickDims.bottomEdge
                 ) {
                     // Collision detected. Find which side of the brick the ball hit
-                    const ballFromTop = Math.abs(ballDims.bottomEdge - brickDims.topEdge);
-                    const ballFromBottom = Math.abs(ballDims.topEdge - brickDims.bottomEdge);
-                    const ballFromLeft = Math.abs(ballDims.rightEdge - brickDims.leftEdge);
-                    const ballFromRight = Math.abs(ballDims.leftEdge - brickDims.rightEdge);
+                    const ballCenter = ballDims.leftEdge + (ballDims.rightEdge - ballDims.leftEdge) / 2;
+
+                    
+
+                    const ballFromTop = Math.min(Math.abs(ballDims.bottomEdge - brickDims.topEdge), Math.abs(ballCenter - brickDims.topEdge));
+                    const ballFromBottom = Math.min(Math.abs(ballDims.topEdge - brickDims.bottomEdge), Math.abs(ballCenter - brickDims.bottomEdge));
+                    const ballFromLeft = Math.min(Math.abs(ballDims.rightEdge - brickDims.leftEdge), Math.abs(ballCenter - brickDims.leftEdge));
+                    const ballFromRight = Math.min(Math.abs(ballDims.leftEdge - brickDims.rightEdge), Math.abs(ballCenter - brickDims.rightEdge));
 
                     const minDistance = Math.min(ballFromTop, ballFromBottom, ballFromLeft, ballFromRight);
 
