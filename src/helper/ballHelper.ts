@@ -197,10 +197,13 @@ class BallHelper {
 
                     // Update ball velocity based on collision side
                     if (minDistance === ballFromTop || minDistance === ballFromBottom) {
+                        console.log('Ball hit top or bottom of the brick');
                         this.velocity.current.y *= -1; // Reverse vertical direction
                     } else if (minDistance === ballFromLeft || minDistance === ballFromRight) {
+                        console.log('Ball hit left or right of the brick');
                         this.velocity.current.x *= -1; // Reverse horizontal direction
                     } else {
+                        console.log('Ball hit the corner of the brick');
                         this.velocity.current.y *= -1; // Reverse vertical direction
                         this.velocity.current.x *= 0; // Drop the ball in straight line
                     }
@@ -223,7 +226,7 @@ class BallHelper {
                             console.log('Game won');
                         }, 500);
                     }
-                    // break;
+                    break;
                 }
             }
 
