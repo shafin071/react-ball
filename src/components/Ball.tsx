@@ -21,6 +21,11 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs 
 
     const playAreaDims = getPlayAreaDimensions(playAreaRef);
 
+    const intervalRef = useRef<number | null>(null); // Persist intervalId across renders
+
+    // Reset intervalRef to null every time Ball mounts
+    intervalRef.current = null;
+
     // Dynamically update brickCount when brickRefs.current changes
     useEffect(() => {
         if (brickRefs.current) {
@@ -31,8 +36,10 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs 
     useEffect(() => {
         // console.log('in ball useEffect')
         let animationFrameId: number;
+        let frameCount = 0; // Counter for requestAnimationFrame calls
 
         const moveBallAnimation = () => {
+            frameCount++; // Increment the counter on each call
             // console.log('in moveBallAnimation');
             if (gameStore.gameLost) {
                 // console.log('game lost... canceling animation frame');
@@ -51,6 +58,13 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs 
             // console.log('animationFrameId in Ball:', animationFrameId);
         };
 
+        // Log the frame count every second
+        intervalRef.current = window.setInterval(() => {
+            // console.log(`requestAnimationFrame called ${frameCount} times in the last second`);
+            frameCount = 0; // Reset the counter
+        }, 1000);
+        console.log('intervalRef.current in Ball:', intervalRef.current);
+
         // Initialize ball position
         if (gameStore.gameLost) {
             // console.log('if gamelost if loop:', gameStore.gameLost);
@@ -64,8 +78,12 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs 
 
         // Cleanup on component unmount
         return () => {
-            // console.log('Cleaning up animation frame in Ball', animationFrameId);
+            console.log('Cleaning up animation frame in Ball', animationFrameId);
             cancelAnimationFrame(animationFrameId);
+            console.log('Cleaning up intervalRef.current in Ball', intervalRef.current);
+            if (intervalRef.current !== null) {
+                clearInterval(intervalRef.current); // Clear the interval
+            }
         };
     }, [gameStore.gameLost]);
 
