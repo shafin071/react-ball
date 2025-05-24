@@ -82,7 +82,7 @@ describe('BallHelper collision with bricks', () => {
             const moveBallProps: moveBallProps = { ballRef, paddleRef, brickCount, brickRefs, playAreaDims, velocity, gameStore };
             // Create BallHelper instance
             ballHelper = new BallHelper(moveBallProps);
-            ballHelper.handleBallCollisionWithBricks(playAreaDims, ballDims, brickRefs, brickCount);
+            ballHelper.handleBallCollisionWithBricks(ballDims);
 
             // Fast-forward time to allow setTimeout to execute
             jest.runAllTimers();
@@ -113,7 +113,7 @@ describe('BallHelper collision with bricks', () => {
             const moveBallProps: moveBallProps = { ballRef, paddleRef, brickCount, brickRefs, playAreaDims, velocity, gameStore };
             // Create BallHelper instance
             ballHelper = new BallHelper(moveBallProps);
-            ballHelper.handleBallCollisionWithBricks(playAreaDims, ballDims, brickRefs, brickCount);
+            ballHelper.handleBallCollisionWithBricks(ballDims);
 
             // Fast-forward time to allow setTimeout to execute
             jest.runAllTimers();
@@ -145,7 +145,7 @@ describe('BallHelper collision with bricks', () => {
 
             const moveBallProps: moveBallProps = { ballRef, paddleRef, brickCount, brickRefs, playAreaDims, velocity, gameStore };
             ballHelper = new BallHelper(moveBallProps);
-            ballHelper.handleBallCollisionWithBricks(playAreaDims, ballDims, brickRefs, brickCount);
+            ballHelper.handleBallCollisionWithBricks(ballDims);
 
             // Fast-forward time to allow setTimeout to execute
             jest.runAllTimers();
@@ -177,7 +177,7 @@ describe('BallHelper collision with bricks', () => {
             const moveBallProps: moveBallProps = { ballRef, paddleRef, brickCount, brickRefs, playAreaDims, velocity, gameStore };
             // Create BallHelper instance
             ballHelper = new BallHelper(moveBallProps);
-            ballHelper.handleBallCollisionWithBricks(playAreaDims, ballDims, brickRefs, brickCount);
+            ballHelper.handleBallCollisionWithBricks(ballDims);
 
             // Fast-forward time to allow setTimeout to execute
             jest.runAllTimers();
@@ -208,7 +208,7 @@ describe('BallHelper collision with bricks', () => {
             const moveBallProps: moveBallProps = { ballRef, paddleRef, brickCount, brickRefs, playAreaDims, velocity, gameStore };
             // Create BallHelper instance
             ballHelper = new BallHelper(moveBallProps);
-            ballHelper.handleBallCollisionWithBricks(playAreaDims, ballDims, brickRefs, brickCount);
+            ballHelper.handleBallCollisionWithBricks(ballDims);
 
             // Fast-forward time to allow setTimeout to execute
             jest.runAllTimers();

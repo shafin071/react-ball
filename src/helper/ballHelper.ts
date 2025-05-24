@@ -1,4 +1,4 @@
-import { Gamestate, PlayAreaDimensions, PaddleDimensions, BallDimensions, moveBallProps } from "../models/gameModels";
+import { Gamestate, PlayAreaDimensions, PaddleDimensions, BallDimensions, BrickDimensions, moveBallProps } from "../models/gameModels";
 import { getPaddleDimensions } from './paddleHelper';
 import { getBrickAreaDimensions, getBrickDimensions } from "./brickHelper";
 import { pre } from "motion/react-client";
@@ -28,12 +28,18 @@ class BallHelper {
     private paddleRef: React.RefObject<HTMLDivElement | null>;
     private velocity: { current: { x: number; y: number } };
     private gameStore: Gamestate;
+    private playAreaDims: PlayAreaDimensions;
+    private brickRefs: React.RefObject<(HTMLDivElement | null)[]>;
+    private brickCount: { current: number };
 
     constructor(moveBallProps: moveBallProps) {
         this.ballRef = moveBallProps.ballRef;
         this.paddleRef = moveBallProps.paddleRef;
         this.velocity = moveBallProps.velocity;
         this.gameStore = moveBallProps.gameStore;
+        this.playAreaDims = moveBallProps.playAreaDims;
+        this.brickRefs = moveBallProps.brickRefs;
+        this.brickCount = moveBallProps.brickCount;
     }
 
     /**
@@ -159,162 +165,115 @@ class BallHelper {
     }
 
     /**
+     * Populates the collidingBricks array with bricks that are colliding with the ball.
+     * This method checks if the ball's dimensions overlap with the brick's dimensions.
+     *
+     * @param {BallDimensions} ballDims - The dimensions of the ball.
+     * @param {HTMLDivElement} brick - The brick element to check for collision.
+     * @param {HTMLDivElement[]} collidingBricks - The array to populate with colliding bricks.
+     */
+    populationCollidingBricks(ballDims: BallDimensions, brick: HTMLDivElement, collidingBricks: HTMLDivElement[]) {
+        // Check collision with the current position of the ball
+        let brickDims = getBrickDimensions(brick, this.playAreaDims);
+
+        const collision = (
+            ballDims.rightEdge >= brickDims.leftEdge &&
+            ballDims.leftEdge <= brickDims.rightEdge &&
+            ballDims.bottomEdge >= brickDims.topEdge &&
+            ballDims.topEdge <= brickDims.bottomEdge
+        );
+
+        // Populate collidingBricks with the bricks that are colliding with the ball.
+        if (collision) {
+            collidingBricks.push(brick);
+        }
+    }
+
+    /**
+     * Handles the change of direction of the ball after a collision with a brick.
+     * This method determines which side of the brick the ball hit and updates the ball's velocity accordingly.
+     *
+     * @param {BallDimensions} ballDims - The dimensions of the ball.
+     * @param {BrickDimensions} brickDims - The dimensions of the brick.
+     */
+    handleBallChangeOfDirectionAfterBrickCollision(ballDims: BallDimensions, brickDims: BrickDimensions) {
+        // Collision detected. Find which side of the brick the ball hit
+        let ballFromBrickTopEdge = Math.abs(ballDims.bottomEdge - brickDims.topEdge);
+        let ballFromBrickBottomEdge = Math.abs(ballDims.topEdge - brickDims.bottomEdge);
+        let ballFromBrickLeftEdge = Math.abs(ballDims.rightEdge - brickDims.leftEdge);
+        let ballFromBrickRightEdge = Math.abs(ballDims.leftEdge - brickDims.rightEdge);
+
+        const minDistance = Math.min(ballFromBrickTopEdge, ballFromBrickBottomEdge, ballFromBrickLeftEdge, ballFromBrickRightEdge);
+
+        // Update ball velocity based on collision side
+        if (minDistance === ballFromBrickTopEdge || minDistance === ballFromBrickBottomEdge) {
+            // console.log('Previous position of ball hit top or bottom of the brick');
+            this.velocity.current.y *= -1; // Reverse vertical direction
+
+        } else if (minDistance === ballFromBrickLeftEdge || minDistance === ballFromBrickRightEdge) {
+            // console.log('Previous position of ball hit left or right of the brick');
+            this.velocity.current.x *= -1; // Reverse horizontal direction
+
+        } else {
+            // console.log('Ball hit the corner of the brick');
+            this.velocity.current.y *= -1; // Reverse vertical direction
+            this.velocity.current.x *= 0; // Drop the ball in straight line
+        }
+    }
+
+
+    /**
      * Handles collisions of the ball with bricks.
      * When brick count reaches zero, it triggers a game win state.
      *
-     * @param {PlayAreaDimensions} playAreaDims - The dimensions of the play area.
      * @param {BallDimensions} ballDims - The dimensions of the ball.
-     * @param {React.RefObject<(HTMLDivElement | null)[]>} brickRefs - References to the brick DOM elements.
-     * @param {object} brickCount - An object containing the current count of bricks.
      */
-    handleBallCollisionWithBricks(playAreaDims: PlayAreaDimensions, ballDims: BallDimensions, brickRefs: React.RefObject<(HTMLDivElement | null)[]>, brickCount: { current: number }): void {
-        // console.log('In handleBallCollisionWithBricks...');
-        const collidingBricks = [];
+    handleBallCollisionWithBricks(ballDims: BallDimensions): void {
+        let collidingBricks: HTMLDivElement[] = [];
 
-        // Calculate the previous position of the ball
-        const previousBallDims = {
-            leftEdge: ballDims.leftEdge - this.velocity.current.x,
-            rightEdge: ballDims.rightEdge - this.velocity.current.x,
-            topEdge: ballDims.topEdge - this.velocity.current.y,
-            bottomEdge: ballDims.bottomEdge - this.velocity.current.y
-        };
-
-        for (let index = 0; index < brickRefs.current.length; index++) {
-            const brick = brickRefs.current[index];
+        // Loops through all bricks to check for collisions of the ball with brick/multiple bricks. 
+        for (let index = 0; index < this.brickRefs.current.length; index++) {
+            const brick = this.brickRefs.current[index];
 
             if (brick && this.ballRef.current) {
                 // Check if the brick already has the 'brick-exit' class
                 if (brick.classList.contains('brick-exit')) {
                     continue; // Skip this brick if it already has the 'brick-exit' class
                 }
-
-                let brickDims = getBrickDimensions(brick, playAreaDims);
-
-                // Check collision with the current position of the ball
-                const currentCollision = (
-                    ballDims.rightEdge >= brickDims.leftEdge &&
-                    ballDims.leftEdge <= brickDims.rightEdge &&
-                    ballDims.bottomEdge >= brickDims.topEdge &&
-                    ballDims.topEdge <= brickDims.bottomEdge
-                );
-
-                // Check collision with the previous position of the ball
-                // const previousCollision = (
-                //     previousBallDims.rightEdge >= brickDims.leftEdge &&
-                //     previousBallDims.leftEdge <= brickDims.rightEdge &&
-                //     previousBallDims.bottomEdge >= brickDims.topEdge &&
-                //     previousBallDims.topEdge <= brickDims.bottomEdge
-                // );
-
-                if (currentCollision) {
-                    collidingBricks.push({ brick, brickDims });
-
-
-                    // Collision detected. Find which side of the brick the ball hit
-                    // const ballCenter = ballDims.leftEdge + (ballDims.rightEdge - ballDims.leftEdge) / 2;
-
-                    // const ballBottomEdgeToBrickTopEdge = Math.abs(ballDims.bottomEdge - brickDims.topEdge);
-                    // const ballTopEdgeToBrickBottomEdge = Math.abs(ballDims.topEdge - brickDims.bottomEdge);
-                    // const ballLeftEdgeToBrickRightEdge = Math.abs(ballDims.leftEdge - brickDims.rightEdge);
-                    // const ballRightEdgeToBrickLeftEdge = Math.abs(ballDims.rightEdge - brickDims.leftEdge);
-
-                    // const BallCenterToBrickTopEdge = Math.abs(ballCenter - brickDims.topEdge);
-                    // const BallCenterToBrickBottomEdge = Math.abs(ballCenter - brickDims.bottomEdge);
-                    // const BallCenterToBrickLeftEdge = Math.abs(ballCenter - brickDims.leftEdge);
-                    // const BallCenterToBrickRightEdge = Math.abs(ballCenter - brickDims.rightEdge);
-
-                    // const ballFromTop = Math.min(Math.abs(ballDims.bottomEdge - brickDims.topEdge), Math.abs(ballCenter - brickDims.topEdge));
-                    // const ballFromBottom = Math.min(Math.abs(ballDims.topEdge - brickDims.bottomEdge), Math.abs(ballCenter - brickDims.bottomEdge));
-                    // const ballFromLeft = Math.min(Math.abs(ballDims.rightEdge - brickDims.leftEdge), Math.abs(ballCenter - brickDims.leftEdge));
-                    // const ballFromRight = Math.min(Math.abs(ballDims.leftEdge - brickDims.rightEdge), Math.abs(ballCenter - brickDims.rightEdge));
-
-                    // const ballFromBrickTopEdge = Math.min(ballBottomEdgeToBrickTopEdge, BallCenterToBrickTopEdge);
-                    // const ballFromBrickBottomEdge = Math.min(ballTopEdgeToBrickBottomEdge, BallCenterToBrickBottomEdge);
-                    // const ballFromBrickLeftEdge = Math.min(ballLeftEdgeToBrickRightEdge, BallCenterToBrickLeftEdge);
-                    // const ballFromBrickRightEdge = Math.min(ballRightEdgeToBrickLeftEdge, BallCenterToBrickRightEdge);
-
-                    // // Collision detected. Find which side of the brick the ball hit
-                    // const ballFromBrickTopEdge = Math.abs(ballDims.bottomEdge - brickDims.topEdge);
-                    // const ballFromBrickBottomEdge = Math.abs(ballDims.topEdge - brickDims.bottomEdge);
-                    // const ballFromBrickLeftEdge = Math.abs(ballDims.rightEdge - brickDims.leftEdge);
-                    // const ballFromBrickRightEdge = Math.abs(ballDims.leftEdge - brickDims.rightEdge);
-
-                    // const minDistance = Math.min(ballFromBrickTopEdge, ballFromBrickBottomEdge, ballFromBrickLeftEdge, ballFromBrickRightEdge);
-
-                    // // Update ball velocity based on collision side
-                    // if (minDistance === ballFromBrickTopEdge || minDistance === ballFromBrickBottomEdge) {
-                    //     // console.log('Ball hit top or bottom of the brick');
-                    //     this.velocity.current.y *= -1; // Reverse vertical direction
-
-                    // } else if (minDistance === ballFromBrickLeftEdge || minDistance === ballFromBrickRightEdge) {
-                    //     // console.log('Ball hit left or right of the brick');
-
-                    //     // console.log('ballCenter:', ballCenter, 'ballTopEdge:', ballDims.topEdge, 'ballBottomEdge:', ballDims.bottomEdge,
-                    //     //     'ballLeftEdge:', ballDims.leftEdge, 'ballRightEdge:', ballDims.rightEdge,
-                    //     // );
-
-                    //     // console.log('brickTopEdge:', brickDims.topEdge, 'brickBottomEdge:', brickDims.bottomEdge,
-                    //     //     'brickLeftEdge:', brickDims.leftEdge, 'brickRightEdge:', brickDims.rightEdge);
-
-                    //     // console.log('ballBottomEdgeToBrickTopEdge:', ballBottomEdgeToBrickTopEdge, 'ballTopEdgeToBrickBottomEdge:', ballTopEdgeToBrickBottomEdge,
-                    //     //     'ballLeftEdgeToBrickRightEdge:', ballLeftEdgeToBrickRightEdge, 'ballRightEdgeToBrickLeftEdge:', ballRightEdgeToBrickLeftEdge);
-
-                    //     // console.log('BallCenterToBrickTopEdge:', BallCenterToBrickTopEdge, 'BallCenterToBrickBottomEdge:', BallCenterToBrickBottomEdge,
-                    //     //     'BallCenterToBrickRightEdge:', BallCenterToBrickRightEdge, 'BallCenterToBrickLeftEdge:', BallCenterToBrickLeftEdge);
-
-                    //     // console.log('minDistance:', minDistance);
-
-                    //     this.velocity.current.x *= -1; // Reverse horizontal direction
-
-                    // } else {
-                    //     console.log('Ball hit the corner of the brick');
-                    //     this.velocity.current.y *= -1; // Reverse vertical direction
-                    //     this.velocity.current.x *= 0; // Drop the ball in straight line
-                    // }
-
-                    // // Handle brick removal
-                    // brick.classList.add('brick-exit');
-                    // brickCount.current -= 1;
-                    // // console.log('brickCount.current: ', brickCount.current);
-                    // const brickPoint = parseInt(brick.dataset.score || '0', 10);
-                    // this.gameStore.setScore(brickPoint);
-
-                    // setTimeout(() => {
-                    //     brick.style.visibility = 'hidden';
-                    // }, 100);
-
-                    // if (brickCount.current <= 0) {
-                    //     console.log('All bricks destroyed. Brick count is 0');
-                    //     setTimeout(() => {
-                    //         this.gameStore.endGame(true);
-                    //         console.log('Game won');
-                    //     }, 500);
-                    // }
-                    // console.log('current ball velocity:', this.velocity.current.x, this.velocity.current.y, '\n');
-                    // break;
-                }
+                this.populationCollidingBricks(ballDims, brick, collidingBricks)
             }
-
         }
 
-        // resolve colliding with multiple bricks
-        // if (collidingBricks.length > 0) {
-
-        // }
+        // Now process the bricks in collidingBricks
         if (collidingBricks.length > 0) {
-            let primaryBrickDims;
+            let primaryBrick;
 
             if (collidingBricks.length === 2) {
-                // Determine which brick the ball went into more
+                // Determine which brick the ball went into more to determine which brick to bounce off of.
+                // Compare the overlaps to find the primary brick
                 const [brick1, brick2] = collidingBricks;
-                const overlap1 = Math.min(ballDims.rightEdge, brick1.brickDims.rightEdge) - Math.max(ballDims.leftEdge, brick1.brickDims.leftEdge);
-                const overlap2 = Math.min(ballDims.rightEdge, brick2.brickDims.rightEdge) - Math.max(ballDims.leftEdge, brick2.brickDims.leftEdge);
-                const primaryBrick = overlap1 > overlap2 ? brick1 : brick2;
-                primaryBrickDims = primaryBrick.brickDims;
+
+                const brick1Dims = getBrickDimensions(brick1, this.playAreaDims);
+                const brick2Dims = getBrickDimensions(brick2, this.playAreaDims);
+
+                const overlap1 = Math.min(ballDims.rightEdge, brick1Dims.rightEdge) - Math.max(ballDims.leftEdge, brick1Dims.leftEdge);
+                const overlap2 = Math.min(ballDims.rightEdge, brick2Dims.rightEdge) - Math.max(ballDims.leftEdge, brick2Dims.leftEdge);
+                primaryBrick = overlap1 > overlap2 ? brick1 : brick2;
             }
             else {
-                primaryBrickDims = collidingBricks[0].brickDims;
+                primaryBrick = collidingBricks[0];
             }
+
+            const primaryBrickDims = getBrickDimensions(primaryBrick, this.playAreaDims);
+
+            // Calculate the previous position of the ball
+            const previousBallDims = {
+                width: ballDims.width,
+                leftEdge: ballDims.leftEdge - this.velocity.current.x,
+                rightEdge: ballDims.rightEdge - this.velocity.current.x,
+                topEdge: ballDims.topEdge - this.velocity.current.y,
+                bottomEdge: ballDims.bottomEdge - this.velocity.current.y
+            };
 
             // Check collision with the previous position of the ball
             const previousCollision = (
@@ -324,87 +283,14 @@ class BallHelper {
                 previousBallDims.topEdge <= primaryBrickDims.bottomEdge
             );
 
-            if (previousCollision) {
-                // Collision detected. Find which side of the brick the ball hit
-                let ballFromBrickTopEdge = Math.abs(previousBallDims.bottomEdge - primaryBrickDims.topEdge);
-                let ballFromBrickBottomEdge = Math.abs(previousBallDims.topEdge - primaryBrickDims.bottomEdge);
-                let ballFromBrickLeftEdge = Math.abs(previousBallDims.rightEdge - primaryBrickDims.leftEdge);
-                let ballFromBrickRightEdge = Math.abs(previousBallDims.leftEdge - primaryBrickDims.rightEdge);
+            const currentBallDims = (previousCollision) ? previousBallDims : ballDims;
+            // Handle the change of direction of the ball after brick collision
+            this.handleBallChangeOfDirectionAfterBrickCollision(currentBallDims, primaryBrickDims);
 
-                const minDistance = Math.min(ballFromBrickTopEdge, ballFromBrickBottomEdge, ballFromBrickLeftEdge, ballFromBrickRightEdge);
-
-                // Update ball velocity based on collision side
-                if (minDistance === ballFromBrickTopEdge || minDistance === ballFromBrickBottomEdge) {
-                    // console.log('Previous position of ball hit top or bottom of the brick');
-                    this.velocity.current.y *= -1; // Reverse vertical direction
-
-                } else if (minDistance === ballFromBrickLeftEdge || minDistance === ballFromBrickRightEdge) {
-                    console.log('Previous position of ball hit left or right of the brick');
-
-                    // console.log('ballCenter:', ballCenter, 'ballTopEdge:', ballDims.topEdge, 'ballBottomEdge:', ballDims.bottomEdge,
-                    //     'ballLeftEdge:', ballDims.leftEdge, 'ballRightEdge:', ballDims.rightEdge,
-                    // );
-
-                    // console.log('brickTopEdge:', brickDims.topEdge, 'brickBottomEdge:', brickDims.bottomEdge,
-                    //     'brickLeftEdge:', brickDims.leftEdge, 'brickRightEdge:', brickDims.rightEdge);
-
-                    // console.log('ballBottomEdgeToBrickTopEdge:', ballBottomEdgeToBrickTopEdge, 'ballTopEdgeToBrickBottomEdge:', ballTopEdgeToBrickBottomEdge,
-                    //     'ballLeftEdgeToBrickRightEdge:', ballLeftEdgeToBrickRightEdge, 'ballRightEdgeToBrickLeftEdge:', ballRightEdgeToBrickLeftEdge);
-
-                    // console.log('minDistance:', minDistance);
-
-                    this.velocity.current.x *= -1; // Reverse horizontal direction
-
-                } else {
-                    // console.log('Ball hit the corner of the brick');
-                    this.velocity.current.y *= -1; // Reverse vertical direction
-                    this.velocity.current.x *= 0; // Drop the ball in straight line
-                }
-
-            } else {
-                // Collision detected. Find which side of the brick the ball hit
-                let ballFromBrickTopEdge = Math.abs(ballDims.bottomEdge - primaryBrickDims.topEdge);
-                let ballFromBrickBottomEdge = Math.abs(ballDims.topEdge - primaryBrickDims.bottomEdge);
-                let ballFromBrickLeftEdge = Math.abs(ballDims.rightEdge - primaryBrickDims.leftEdge);
-                let ballFromBrickRightEdge = Math.abs(ballDims.leftEdge - primaryBrickDims.rightEdge);
-
-                const minDistance = Math.min(ballFromBrickTopEdge, ballFromBrickBottomEdge, ballFromBrickLeftEdge, ballFromBrickRightEdge);
-
-                // Update ball velocity based on collision side
-                if (minDistance === ballFromBrickTopEdge || minDistance === ballFromBrickBottomEdge) {
-                    // console.log('Ball hit top or bottom of the brick');
-                    this.velocity.current.y *= -1; // Reverse vertical direction
-
-                } else if (minDistance === ballFromBrickLeftEdge || minDistance === ballFromBrickRightEdge) {
-                    console.log('Ball hit left or right of the brick');
-
-                    // console.log('ballCenter:', ballCenter, 'ballTopEdge:', ballDims.topEdge, 'ballBottomEdge:', ballDims.bottomEdge,
-                    //     'ballLeftEdge:', ballDims.leftEdge, 'ballRightEdge:', ballDims.rightEdge,
-                    // );
-
-                    // console.log('brickTopEdge:', brickDims.topEdge, 'brickBottomEdge:', brickDims.bottomEdge,
-                    //     'brickLeftEdge:', brickDims.leftEdge, 'brickRightEdge:', brickDims.rightEdge);
-
-                    // console.log('ballBottomEdgeToBrickTopEdge:', ballBottomEdgeToBrickTopEdge, 'ballTopEdgeToBrickBottomEdge:', ballTopEdgeToBrickBottomEdge,
-                    //     'ballLeftEdgeToBrickRightEdge:', ballLeftEdgeToBrickRightEdge, 'ballRightEdgeToBrickLeftEdge:', ballRightEdgeToBrickLeftEdge);
-
-                    // console.log('minDistance:', minDistance);
-
-                    this.velocity.current.x *= -1; // Reverse horizontal direction
-
-                } else {
-                    // console.log('Ball hit the corner of the brick');
-                    this.velocity.current.y *= -1; // Reverse vertical direction
-                    this.velocity.current.x *= 0; // Drop the ball in straight line
-                }
-
-            }
-
-
-            // Handle brick removal for both bricks
-            collidingBricks.forEach(({ brick }) => {
+            // Remove bricks from screen and update score
+            collidingBricks.forEach((brick) => {
                 brick.classList.add('brick-exit');
-                brickCount.current -= 1;
+                this.brickCount.current -= 1;
                 const brickPoint = parseInt(brick.dataset.score || '0', 10);
                 this.gameStore.setScore(brickPoint);
 
@@ -413,82 +299,13 @@ class BallHelper {
                 }, 100);
             });
 
-            if (brickCount.current <= 0) {
+            if (this.brickCount.current <= 0) {
                 setTimeout(() => {
                     this.gameStore.endGame(true);
                 }, 500);
             }
 
         }
-
-        // Check if the ball is colliding with 2 bricks at the same time
-        // const collidingBricks = [];
-        // for (let index = 0; index < brickRefs.current.length; index++) {
-        //     const brick = brickRefs.current[index];
-
-        //     if (brick && this.ballRef.current) {
-        //         if (brick.classList.contains('brick-exit')) {
-        //             continue; // Skip already destroyed bricks
-        //         }
-
-        //         const brickDims = getBrickDimensions(brick, playAreaDims);
-
-        //         if (
-        //             ballDims.rightEdge >= brickDims.leftEdge &&
-        //             ballDims.leftEdge <= brickDims.rightEdge &&
-        //             ballDims.bottomEdge >= brickDims.topEdge &&
-        //             ballDims.topEdge <= brickDims.bottomEdge
-        //         ) {
-        //             collidingBricks.push({ brick, brickDims });
-        //         }
-        //     }
-        // }
-
-        // if (collidingBricks.length === 2) {
-        //     // Determine which brick the ball went into more
-        //     const [brick1, brick2] = collidingBricks;
-        //     const overlap1 = Math.min(
-        //         ballDims.rightEdge, brick1.brickDims.rightEdge
-        //     ) - Math.max(ballDims.leftEdge, brick1.brickDims.leftEdge);
-        //     const overlap2 = Math.min(
-        //         ballDims.rightEdge, brick2.brickDims.rightEdge
-        //     ) - Math.max(ballDims.leftEdge, brick2.brickDims.leftEdge);
-
-        //     const primaryBrick = overlap1 > overlap2 ? brick1 : brick2;
-        //     const primaryBrickDims = primaryBrick.brickDims;
-
-        //     // Determine which edge of the primary brick the ball hit
-        //     const ballFromTop = Math.abs(ballDims.bottomEdge - primaryBrickDims.topEdge);
-        //     const ballFromBottom = Math.abs(ballDims.topEdge - primaryBrickDims.bottomEdge);
-        //     const ballFromLeft = Math.abs(ballDims.rightEdge - primaryBrickDims.leftEdge);
-        //     const ballFromRight = Math.abs(ballDims.leftEdge - primaryBrickDims.rightEdge);
-
-        //     const minDistance = Math.min(ballFromTop, ballFromBottom, ballFromLeft, ballFromRight);
-
-        //     if (minDistance === ballFromTop || minDistance === ballFromBottom) {
-        //         this.velocity.current.y *= -1; // Reverse vertical direction
-        //     } else if (minDistance === ballFromLeft || minDistance === ballFromRight) {
-        //         this.velocity.current.x *= -1; // Reverse horizontal direction
-        //     }
-
-        //     // Handle brick removal for both bricks
-        //     collidingBricks.forEach(({ brick }) => {
-        //         brick.classList.add('brick-exit');
-        //         brickCount.current -= 1;
-        //         const brickPoint = parseInt(brick.dataset.score || '0', 10);
-        //         this.gameStore.setScore(brickPoint);
-
-        //         setTimeout(() => {
-        //             brick.style.visibility = 'hidden';
-        //         }, 100);
-        //     });
-
-        //     if (brickCount.current <= 0) {
-        //         setTimeout(() => {
-        //             this.gameStore.endGame(true);
-        //         }, 500);
-        //     }
-        // }
     }
 
     /**
@@ -513,22 +330,15 @@ class BallHelper {
 
     /**
      * Moves the ball within the play area, handling collisions and updating its position.
-     *
-     * @param {PlayAreaDimensions} playAreaDims - The dimensions of the play area.
-     * @param {React.RefObject<(HTMLDivElement | null)[]>} brickRefs - References to the brick DOM elements.
-     * @param {object} brickCount - An object containing the current count of bricks.
      */
-    moveBall(playAreaDims: PlayAreaDimensions, brickRefs: React.RefObject<(HTMLDivElement | null)[]>, brickCount: { current: number }): void {
-        // Measure execution time for moveBall
-        const startTime = performance.now();
-
-        if (!this.ballRef.current || !this.paddleRef.current || !brickRefs.current) return;
+    moveBall(): void {
+        if (!this.ballRef.current || !this.paddleRef.current || !this.brickRefs.current) return;
 
         const ballDims = this.getBallDimensions();
         const paddleDims = getPaddleDimensions(this.paddleRef);
 
         // Handle collisions with boundaries
-        const hitBottom = this.handleBallCollisionWithBoundaries(ballDims, playAreaDims);
+        const hitBottom = this.handleBallCollisionWithBoundaries(ballDims, this.playAreaDims);
         if (hitBottom) return; // Exit if the ball hits the bottom boundary
 
         // Handle collisions with paddle when the ball is near the paddle
@@ -537,13 +347,13 @@ class BallHelper {
         }
 
         // Handle collisions with bricks if ball is near the brick section
-        const { brickSectionHeight } = getBrickAreaDimensions(playAreaDims);
+        const { brickSectionHeight } = getBrickAreaDimensions(this.playAreaDims);
         if (ballDims.topEdge <= brickSectionHeight + 10) {
-            this.handleBallCollisionWithBricks(playAreaDims, ballDims, brickRefs, brickCount);
+            this.handleBallCollisionWithBricks(ballDims);
         }
 
         // Handle all bricks destroyed
-        this.handleAllBricksDestroyed(brickCount);
+        this.handleAllBricksDestroyed(this.brickCount);
 
         // Update ball position
         const newLeft = ballDims.leftEdge + this.velocity.current.x;
@@ -551,13 +361,6 @@ class BallHelper {
 
         this.ballRef.current.style.left = `${newLeft}px`;
         this.ballRef.current.style.top = `${newTop}px`;
-
-
-
-        // ...existing moveBall logic...
-
-        const endTime = performance.now();
-        // console.log(`moveBall execution time: ${endTime - startTime} ms`);
     }
 }
 

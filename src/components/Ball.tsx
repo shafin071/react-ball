@@ -41,7 +41,7 @@ const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs 
 
             const moveBallProps: moveBallProps = { ballRef, paddleRef, brickCount, brickRefs, playAreaDims, velocity, gameStore };
             const ballHelper = new BallHelper(moveBallProps);
-            ballHelper.moveBall(playAreaDims, brickRefs, brickCount);
+            ballHelper.moveBall();
 
             // Schedule the next frame
             animationFrameId = requestAnimationFrame(moveBallAnimation);
