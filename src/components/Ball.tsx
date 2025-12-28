@@ -15,7 +15,7 @@ interface BallProps {
 
 const Ball: React.FC<BallProps> = ({ playAreaRef, paddleRef, ballRef, brickRefs }) => {
     const diameter = 15; // Width of the ball
-    const velocity = useRef({ x: 6, y: 6 }); // Ball's velocity (speed and direction)
+    const velocity = useRef({ x: 2, y: 2 }); // Ball's velocity (speed and direction)
     const gameStore = useGameStore();
     const brickCount = useRef(0);
 
